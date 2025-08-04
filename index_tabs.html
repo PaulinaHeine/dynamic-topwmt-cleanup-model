@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Plastic Collection Strategy</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .tabs {
+            display: flex;
+            background-color: #333;
+        }
+        .tabs button {
+            flex: 1;
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 14px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .tabs button:hover {
+            background-color: #555;
+        }
+        .tabs button.active {
+            background-color: #666;
+        }
+        .tab-content {
+            display: none;
+            padding: 2em;
+            background-color: white;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 1em;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+<div class="tabs">
+    <button class="tablink active" onclick="openTab(event, 'home')">Home</button>
+    <button class="tablink" onclick="openTab(event, 'math')">Math</button>
+</div>
+
+<div id="home" class="tab-content active">
+    <h1>Plastic Collection Strategy</h1>
+    <p>
+        This chart shows how the weighting parameter \( \alpha \) affects the total collected value and travel distance of cleanup vessels.
+        The optimal balance is achieved around \( \alpha = 0.8 \).
+    </p>
+    <img src="index_files/AlphaVgl.png" alt="Alpha Optimization Plot">
+</div>
+
+<div id="math" class="tab-content">
+    <h2>Mathematical Model</h2>
+    <p>
+        Objective:
+        \[
+        \max \sum_{t \in T} \sum_{k \in K} \sum_{i \in N_t} \pi_i(t) \cdot x_{i,k}(t)
+        \]
+    </p>
+    <p>Subject to:</p>
+    <ul>
+        <li>
+            Each target can be collected at most once:
+            \[
+            \sum_{t \in T} \sum_{k \in K} x_{i,k}(t) \leq 1 \quad \forall i \in \bigcup_t N_t
+            \]
+        </li>
+        <li>
+            Each vessel targets at most one hotspot per timestep:
+            \[
+            \sum_{i \in N_t} z_{i,k}(t) \leq 1 \quad \forall k \in K, \forall t \in T
+            \]
+        </li>
+        <li>
+            Vessel motion with drift:
+            \[
+            q_k(t + 1) = q_k(t) + v_k(t) \cdot u_k(t) \cdot \Delta t + c_k(t) \cdot \Delta t
+            \]
+        </li>
+    </ul>
+</div>
+
+<script>
+function openTab(evt, tabId) {
+    const tabs = document.querySelectorAll('.tab-content');
+    const buttons = document.querySelectorAll('.tablink');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    buttons.forEach(btn => btn.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    evt.currentTarget.classList.add('active');
+}
+</script>
+
+</body>
+</html>
