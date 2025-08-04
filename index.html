@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Plastic Collection Strategy – Alpha Optimization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: auto;
+            padding: 2em;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #2a4d69;
+        }
+        img {
+            width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+            margin-top: 1em;
+        }
+        .caption {
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Plastic Collection Strategy</h1>
+    <p>
+        This chart shows how the weighting parameter <code>α</code> affects the total collected value and travel distance of cleanup vessels.
+        A purely proximity-based strategy (<code>α = 1.0</code>) leads to short paths but misses high-value hotspots.
+        A value-driven strategy (<code>α = 0.0</code>) collects less plastic overall due to long travel times.
+        The optimal balance is achieved at <code>α ≈ 0.8</code>.
+    </p>
+    <img src="index_files/AlphaVgl.png" alt="Alpha Optimization Plot">
+    <p class="caption">Figure: Trade-off between proximity and value-based routing in a dynamic marine environment.</p>
+</body>
+</html>
