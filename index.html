@@ -9,7 +9,6 @@
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-  <!-- Styles -->
   <style>
     body {
       margin: 0;
@@ -23,10 +22,30 @@
       padding: 20px;
       text-align: center;
     }
+    nav {
+      display: flex;
+      justify-content: center;
+      background: #2c5282;
+    }
+    nav button {
+      padding: 14px 20px;
+      border: none;
+      background: #2c5282;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    nav button:hover, nav button.active {
+      background: #4a6483;
+    }
     section {
+      display: none;
       max-width: 960px;
       margin: auto;
       padding: 40px 20px;
+    }
+    section.active {
+      display: block;
     }
     h2 {
       color: #2c5282;
@@ -44,7 +63,7 @@
       overflow: hidden;
       margin: 20px 0;
     }
-    .video-container iframe,
+    .video-container video,
     .iframe-container iframe {
       position: absolute;
       top: 0;
@@ -58,6 +77,13 @@
       padding: 10px;
       border-left: 4px solid #4299e1;
       margin: 20px 0;
+    }
+    .slider-container {
+      margin: 30px 0;
+      text-align: center;
+    }
+    .slider-container input[type=range] {
+      width: 300px;
     }
     footer {
       background: #2c5282;
@@ -74,7 +100,16 @@
   <p>Optimizing vessel paths in dynamic ocean environments with drifting plastic hotspots</p>
 </header>
 
-<section>
+<nav>
+  <button onclick="showTab('problem')" class="active">📍 Problem</button>
+  <button onclick="showTab('math')">📐 Math</button>
+  <button onclick="showTab('logic')">🧠 Logic</button>
+  <button onclick="showTab('comparison')">📊 Comparison</button>
+  <button onclick="showTab('video')">🎥 Video</button>
+  <button onclick="showTab('paper')">📄 Paper</button>
+</nav>
+
+<section id="problem" class="active">
   <h2>📍 Problem Setting</h2>
   <p>Marine debris tends to accumulate in oceanic convergence zones. These zones contain floating plastic patches—called <strong>hotspots</strong>—that vary in size and drift with ocean currents.</p>
   <div class="highlight">
@@ -82,7 +117,7 @@
   </div>
 </section>
 
-<section>
+<section id="math">
   <h2>⚙️ Mathematical Model</h2>
   <p>Each hotspot has a value \( v_i \) and a distance \( d_i \) from the vessel. We define a scoring function to balance both:</p>
   <div class="equation">
@@ -95,7 +130,7 @@
   </ul>
 </section>
 
-<section>
+<section id="logic">
   <h2>🧠 Greedy Routing Logic</h2>
   <ol>
     <li>Compute score for all available hotspots</li>
@@ -109,14 +144,19 @@
     <li>\( \alpha = 0 \): value only → long detours, high risk</li>
     <li>Balanced \( \alpha \): optimized trade-off</li>
   </ul>
+
+  <div class="slider-container">
+    <label for="alphaRange">Adjust α: <span id="alphaValue">0.5</span></label><br>
+    <input type="range" id="alphaRange" min="0" max="1" step="0.01" value="0.5" oninput="updateAlpha(this.value)">
+  </div>
 </section>
 
-<section>
-  <h2>📈 Interactive Comparison</h2>
+<section id="comparison">
+  <h2>📈 Alpha Comparison</h2>
   <img src="AlphaVgl.png" alt="Alpha Comparison Chart" style="width:100%;max-width:800px">
 </section>
 
-<section>
+<section id="video">
   <h2>🎥 Simulation Video</h2>
   <div class="video-container">
     <video controls>
@@ -126,23 +166,29 @@
   </div>
 </section>
 
-<section>
+<section id="paper">
   <h2>📄 Full Paper</h2>
   <div class="iframe-container">
     <iframe src="Reactive_Planning_for_Marine_Debris_Collection_in_Dynamic_Ocean_Environments_Paper.pdf"></iframe>
   </div>
 </section>
 
-<section>
-  <h2>🖥️ Presentation</h2>
-  <div class="iframe-container">
-    <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQivQI7azBttKtfH1sVVBf4tLTLZpBQXw7RsyfPInjTo-BWoSTYIqnhC8uKsPpZ9_KCvCKG52f_fI_D/pub?start=true&loop=false&delayms=5000"></iframe>
-  </div>
-</section>
-
 <footer>
   <p>Paulina Heine · August 2025 · GitHub Pages Presentation</p>
 </footer>
+
+<script>
+  function showTab(id) {
+    document.querySelectorAll("nav button").forEach(btn => btn.classList.remove("active"));
+    document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+    document.querySelector(`nav button[onclick*='${id}']`).classList.add("active");
+    document.getElementById(id).classList.add("active");
+  }
+
+  function updateAlpha(val) {
+    document.getElementById("alphaValue").textContent = val;
+  }
+</script>
 
 </body>
 </html>
