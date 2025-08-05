@@ -1,138 +1,157 @@
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Dynamic TOPWMT Cleanup</title>
+  <meta charset="UTF-8">
+  <title>Dynamic Routing for Marine Debris Collection</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script>
-        var password = prompt("Please enter the password:");
-        if (password !== "meinpasswort") {
-            document.body.innerHTML = "<h1 style='text-align:center;margin-top:20%;color:#aa0000;'>❌ Incorrect password</h1>";
-        }
-    </script>
+  <!-- MathJax for equations -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script type="text/javascript" id="MathJax-script" async
-      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-    </script>
-
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background-color: #f4f7fa; }
-        .tabs { display: flex; background-color: #2a4365; }
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 16px;
-            cursor: pointer;
-            background-color: #2a4365;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-        }
-        .tab:hover, .tab.active {
-            background-color: #4a6483;
-        }
-        .content {
-            display: none;
-            padding: 40px;
-        }
-        .content.active {
-            display: block;
-            max-width: 960px;
-            margin: auto;
-            background: white;
-            box-shadow: 0 0 12px rgba(0,0,0,0.1);
-            border-radius: 10px;
-        }
-        iframe {
-            width: 100%;
-            height: 90vh;
-            border: none;
-        }
-        img {
-            max-width: 100%;
-            margin-top: 20px;
-            border-radius: 6px;
-        }
-        h2 {
-            color: #2a4365;
-        }
-        ul, ol {
-            padding-left: 20px;
-        }
-    </style>
+  <!-- Styles -->
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: #f9f9fb;
+      color: #1a202c;
+    }
+    header {
+      background: #2c5282;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    section {
+      max-width: 960px;
+      margin: auto;
+      padding: 40px 20px;
+    }
+    h2 {
+      color: #2c5282;
+    }
+    .equation {
+      text-align: center;
+      font-size: 1.3rem;
+      margin: 20px 0;
+    }
+    .video-container, .iframe-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+    .video-container iframe,
+    .iframe-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    .highlight {
+      background: #edf2f7;
+      padding: 10px;
+      border-left: 4px solid #4299e1;
+      margin: 20px 0;
+    }
+    footer {
+      background: #2c5282;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+  </style>
 </head>
 <body>
 
-<div class="tabs">
-    <button class="tab active" onclick="openTab(event, 'overview')">🌍 Overview</button>
-    <button class="tab" onclick="openTab(event, 'math')">📐 Math</button>
-    <button class="tab" onclick="openTab(event, 'paper')">📄 Paper</button>
-    <button class="tab" onclick="openTab(event, 'slides')">🎞️ Presentation</button>
-</div>
+<header>
+  <h1>Dynamic Routing for Marine Debris Collection</h1>
+  <p>Optimizing vessel paths in dynamic ocean environments with drifting plastic hotspots</p>
+</header>
 
-<div id="overview" class="content active">
-    <h2>Dynamic Routing for Marine Debris Collection</h2>
-    <p>This project explores a reactive strategy to maximize plastic collection by routing autonomous vessels through drifting hotspots.</p>
-    <ul>
-        <li>Hotspots are modeled as dynamic high-density points</li>
-        <li>Each has a value and moves with ocean currents</li>
-        <li>We combine value and proximity using a score function</li>
-    </ul>
-    <img src="AlphaVgl.png" alt="Alpha Value Comparison Chart">
-</div>
+<section>
+  <h2>📍 Problem Setting</h2>
+  <p>Marine debris tends to accumulate in oceanic convergence zones. These zones contain floating plastic patches—called <strong>hotspots</strong>—that vary in size and drift with ocean currents.</p>
+  <div class="highlight">
+    Objective: <strong>Maximize collected plastic value</strong> within a fixed time horizon by choosing <em>which hotspots to visit</em>, and <em>in what order</em>.
+  </div>
+</section>
 
-<div id="math" class="content">
-    <h2>Mathematical Model</h2>
-    <p>The goal is to maximize collected value over a time horizon using a weighted score for each hotspot:</p>
-    <p style="text-align:center;font-size:18px;">
-      \\[
-        \\text{Score}_i = \\alpha \\cdot \\left(1 - \\frac{d_i}{d_{\\text{max}}}\\right)
-        + (1 - \\alpha) \\cdot \\left(\\frac{v_i}{v_{\\text{max}}}\\right)
-      \\]
-    </p>
-    <ul>
-        <li>\\(d_i\\): distance to hotspot \\(i\\)</li>
-        <li>\\(v_i\\): value of hotspot \\(i\\)</li>
-        <li>\\(\\alpha\\): trade-off parameter (\\(0 \\leq \\alpha \\leq 1\\))</li>
-    </ul>
-    <p>Greedy strategy with α:</p>
-    <ol>
-        <li>Evaluate scores for all reachable hotspots</li>
-        <li>Select the one with the highest score</li>
-        <li>Move toward it and collect</li>
-        <li>Re-evaluate and repeat</li>
-    </ol>
-</div>
+<section>
+  <h2>⚙️ Mathematical Model</h2>
+  <p>Each hotspot has a value \( v_i \) and a distance \( d_i \) from the vessel. We define a scoring function to balance both:</p>
+  <div class="equation">
+    \[ \text{Score}_i = \alpha \cdot \left(1 - \frac{d_i}{d_{\max}}\right) + (1 - \alpha) \cdot \left(\frac{v_i}{v_{\max}}\right) \]
+  </div>
+  <ul>
+    <li>\( \alpha \in [0, 1] \): trade-off parameter</li>
+    <li>\( d_i \): distance to hotspot</li>
+    <li>\( v_i \): value of hotspot</li>
+  </ul>
+</section>
 
-<div id="paper" class="content">
-    <h2>Full Paper</h2>
-    <embed src="Reactive_Planning_for_Marine_Debris_Collection_in_Dynamic_Ocean_Environments_Paper.pdf" type="application/pdf" width="100%" height="900px" />
+<section>
+  <h2>🧠 Greedy Routing Logic</h2>
+  <ol>
+    <li>Compute score for all available hotspots</li>
+    <li>Select the one with the highest score</li>
+    <li>Travel to and collect it</li>
+    <li>Re-evaluate and repeat</li>
+  </ol>
+  <p>Changing \( \alpha \) leads to very different behaviors:</p>
+  <ul>
+    <li>\( \alpha = 1 \): proximity only → short paths, but low value</li>
+    <li>\( \alpha = 0 \): value only → long detours, high risk</li>
+    <li>Balanced \( \alpha \): optimized trade-off</li>
+  </ul>
+</section>
 
-</div>
+<section>
+  <h2>📈 Interactive Comparison</h2>
+  <img src="AlphaVgl.png" alt="Alpha Comparison Chart" style="width:100%;max-width:800px">
+</section>
 
-<div id="slides" class="content">
-    <h2>Presentation Summary</h2>
-    <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQivQI7azBttKtfH1sVVBf4tLTLZpBQXw7RsyfPInjTo-BWoSTYIqnhC8uKsPpZ9_KCvCKG52f_fI_D/pub?start=false&loop=false&delayms=60000" 
-            frameborder="0" width="100%" height="600" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true">
-    </iframe>
-</div>
+<section>
+  <h2>🎥 Simulation Video</h2>
+  <div class="video-container">
+    <video controls>
+      <source src="neu.mov" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</section>
 
-<script>
-    function openTab(evt, tabName) {
-        const contents = document.getElementsByClassName("content");
-        const tabs = document.getElementsByClassName("tab");
-        for (let i = 0; i < contents.length; i++) {
-            contents[i].classList.remove("active");
-        }
-        for (let i = 0; i < tabs.length; i++) {
-            tabs[i].classList.remove("active");
-        }
-        document.getElementById(tabName).classList.add("active");
-        evt.currentTarget.classList.add("active");
-    }
-</script>
+<section>
+  <h2>📄 Full Paper</h2>
+  <div class="iframe-container">
+     <embed src="Reactive_Planning_for_Marine_Debris_Collection_in_Dynamic_Ocean_Environments_Paper.pdf" type="application/pdf" width="100%" height="900px" />
+  </div>
+</section>
+
+
+
+<section>
+  <h2>🖥️ Presentation</h2>
+  <div class="iframe-container">
+    <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQivQI7azBttKtfH1sVVBf4tLTLZpBQXw7RsyfPInjTo-BWoSTYIqnhC8uKsPpZ9_KCvCKG52f_fI_D/pub?start=true&loop=false&delayms=5000"></iframe>
+  </div>
+</section>
+
+<footer>
+  <p>Paulina Heine · August 2025 · GitHub Pages Presentation</p>
+</footer>
+
+</body>
+</html>
+
 
 </body>
 </html>
