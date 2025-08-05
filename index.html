@@ -1,58 +1,85 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Plastic Cleanup Strategy</title>
+    <title>Dynamic TOPWMT Cleanup</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; }
-        .tabs { display: flex; background-color: #333; }
+        body { font-family: Arial, sans-serif; margin: 0; background-color: #f0f4f8; }
+        .tabs { display: flex; background-color: #1e3a5f; }
         .tab {
             flex: 1;
             text-align: center;
             padding: 14px 16px;
             cursor: pointer;
-            background-color: #333;
+            background-color: #1e3a5f;
             color: white;
             border: none;
-            outline: none;
+            font-weight: bold;
         }
         .tab:hover, .tab.active {
-            background-color: #555;
+            background-color: #325d88;
         }
         .content {
             display: none;
-            padding: 20px;
+            padding: 40px;
         }
         .content.active {
             display: block;
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
         }
         iframe {
             width: 100%;
             height: 90vh;
             border: none;
         }
+        img {
+            max-width: 100%;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
 
 <div class="tabs">
-    <button class="tab active" onclick="openTab(event, 'intro')">Intro</button>
+    <button class="tab active" onclick="openTab(event, 'overview')">Overview</button>
     <button class="tab" onclick="openTab(event, 'math')">Math</button>
     <button class="tab" onclick="openTab(event, 'paper')">Paper</button>
 </div>
 
-<div id="intro" class="content active">
-    <h2>Plastic Cleanup Strategy</h2>
-    <p>This page introduces a strategy for collecting marine debris using reactive vessel routing.</p>
+<div id="overview" class="content active">
+    <h2>Dynamic Routing for Marine Debris Collection</h2>
+    <p>This project explores a reactive approach to the Team Orienteering Problem with Moving Targets (TOP-MT), targeting drifting plastic hotspots in oceanic environments. Each hotspot has a value, and our goal is to maximize collection within a limited time window.</p>
+    <img src="AlphaVgl.png" alt="Alpha Value Comparison Chart">
 </div>
 
 <div id="math" class="content">
     <h2>Mathematical Model</h2>
-    <p>The optimization maximizes collected value over time, with decisions made using a score function combining proximity and value:</p>
-    <pre>
-Score_i = α * (1 - d_i / d_max) + (1 - α) * (v_i / v_max)
-    </pre>
-    <p>Subject to constraints on movement, collection radius, and assignment rules.</p>
+    <p>The objective is to collect the maximum total value within a given time horizon.</p>
+    <p>At each step, we compute a score for each available hotspot:</p>
+    <p style="text-align:center;">\[ \text{Score}_i = \alpha \cdot \left(1 - \frac{d_i}{d_{\text{max}}}\right) + (1 - \alpha) \cdot \left(\frac{v_i}{v_{\text{max}}}\right) \]</p>
+    <p>Where:</p>
+    <ul>
+        <li>\( d_i \) is the distance to hotspot \( i \)</li>
+        <li>\( v_i \) is the value of hotspot \( i \)</li>
+        <li>\( \alpha \in [0,1] \) controls the trade-off between proximity and value</li>
+    </ul>
+    <p>Each vessel:</p>
+    <ol>
+        <li>Evaluates scores for all reachable hotspots</li>
+        <li>Selects the one with the highest score</li>
+        <li>Moves toward it and collects if within range</li>
+        <li>Then re-evaluates and repeats</li>
+    </ol>
 </div>
 
 <div id="paper" class="content">
