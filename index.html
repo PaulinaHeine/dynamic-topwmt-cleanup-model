@@ -5,6 +5,15 @@
   <title>Dynamic Routing for Marine Debris Collection</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Password protection -->
+  <script>
+    const password = prompt("Please enter the password:");
+    if (password !== "meinpasswort") {
+      document.write("<h1 style='color:red;text-align:center;margin-top:20%;'>❌ Access denied. Wrong password.</h1>");
+      throw new Error("Access denied");
+    }
+  </script>
+
   <!-- MathJax for equations -->
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -170,7 +179,7 @@
 <section id="paper">
   <h2>📄 Full Paper</h2>
   <div class="iframe-container">
-    <embed src="Reactive_Planning_for_Marine_Debris_Collection_in_Dynamic_Ocean_Environments_Paper.pdf" type="application/pdf" width="100%" height="900px" />
+    <iframe src="Reactive_Planning_for_Marine_Debris_Collection_in_Dynamic_Ocean_Environments_Paper.pdf"></iframe>
   </div>
 </section>
 
