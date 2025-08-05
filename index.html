@@ -107,6 +107,7 @@
   <button onclick="showTab('comparison')">📊 Comparison</button>
   <button onclick="showTab('video')">🎥 Video</button>
   <button onclick="showTab('paper')">📄 Paper</button>
+  <button onclick="showTab('comments')">💬 Comments</button>
 </nav>
 
 <section id="problem" class="active">
@@ -173,6 +174,14 @@
   </div>
 </section>
 
+<section id="comments">
+  <h2>💬 Comments</h2>
+  <textarea id="commentInput" placeholder="Leave a comment..." rows="4" style="width:100%;max-width:800px;"></textarea>
+  <br><br>
+  <button onclick="addComment()">Submit</button>
+  <div id="commentList" style="margin-top:20px;"></div>
+</section>
+
 <footer>
   <p>Paulina Heine · August 2025 · GitHub Pages Presentation</p>
 </footer>
@@ -187,6 +196,22 @@
 
   function updateAlpha(val) {
     document.getElementById("alphaValue").textContent = val;
+  }
+
+  function addComment() {
+    const input = document.getElementById("commentInput");
+    const comment = input.value.trim();
+    if (comment) {
+      const list = document.getElementById("commentList");
+      const entry = document.createElement("div");
+      entry.style.padding = "10px";
+      entry.style.marginBottom = "10px";
+      entry.style.background = "#edf2f7";
+      entry.style.borderLeft = "4px solid #4299e1";
+      entry.textContent = comment;
+      list.appendChild(entry);
+      input.value = "";
+    }
   }
 </script>
 
