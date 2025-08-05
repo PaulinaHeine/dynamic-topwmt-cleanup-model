@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>Dynamic TOPWMT Cleanup</title>
+
     <script>
         var password = prompt("Please enter the password:");
-        if (password !== "meinpw") {
-            document.body.innerHTML = "<h1 style='text-align:center;margin-top:20%;color:#aa0000;'>Access Denied</h1>";
+        if (password !== "meinpasswort") {
+            document.body.innerHTML = "<h1 style='text-align:center;margin-top:20%;color:#aa0000;'>❌ Incorrect password</h1>";
         }
     </script>
+
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script type="text/javascript" id="MathJax-script" async
       src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
     </script>
+
     <style>
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background-color: #f4f7fa; }
         .tabs { display: flex; background-color: #2a4365; }
@@ -66,6 +69,7 @@
     <button class="tab active" onclick="openTab(event, 'overview')">🌍 Overview</button>
     <button class="tab" onclick="openTab(event, 'math')">📐 Math</button>
     <button class="tab" onclick="openTab(event, 'paper')">📄 Paper</button>
+    <button class="tab" onclick="openTab(event, 'slides')">🎞️ Presentation</button>
 </div>
 
 <div id="overview" class="content active">
@@ -81,8 +85,13 @@
 
 <div id="math" class="content">
     <h2>Mathematical Model</h2>
-    <p>The goal is to maximize collected value over a time horizon, using a weighted score for each hotspot:</p>
-    <p style="text-align:center;font-size:18px;">\\[ \\text{Score}_i = \\alpha \\cdot \\left(1 - \\frac{d_i}{d_{\\text{max}}}\\right) + (1 - \\alpha) \\cdot \\left(\\frac{v_i}{v_{\\text{max}}}\\right) \\]</p>
+    <p>The goal is to maximize collected value over a time horizon using a weighted score for each hotspot:</p>
+    <p style="text-align:center;font-size:18px;">
+      \\[
+        \\text{Score}_i = \\alpha \\cdot \\left(1 - \\frac{d_i}{d_{\\text{max}}}\\right)
+        + (1 - \\alpha) \\cdot \\left(\\frac{v_i}{v_{\\text{max}}}\\right)
+      \\]
+    </p>
     <ul>
         <li>\\(d_i\\): distance to hotspot \\(i\\)</li>
         <li>\\(v_i\\): value of hotspot \\(i\\)</li>
@@ -99,7 +108,14 @@
 
 <div id="paper" class="content">
     <h2>Full Paper</h2>
-    <iframe src="Reactive_Planning_for_Marine_Debris_Collection_in_Dynamic_Ocean_Environments_Paper.pdf"></iframe>
+    <iframe src="https://mozilla.github.io/pdf.js/web/viewer.html?file=Reactive_Planning_for_Marine_Debris_Collection_in_Dynamic_Ocean_Environments_Paper.pdf"></iframe>
+</div>
+
+<div id="slides" class="content">
+    <h2>Presentation Summary</h2>
+    <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQivQI7azBttKtfH1sVVBf4tLTLZpBQXw7RsyfPInjTo-BWoSTYIqnhC8uKsPpZ9_KCvCKG52f_fI_D/pub?start=true&loop=false&delayms=5000" 
+            frameborder="0" width="100%" height="600" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true">
+    </iframe>
 </div>
 
 <script>
