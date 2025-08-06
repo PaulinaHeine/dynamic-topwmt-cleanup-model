@@ -8,7 +8,7 @@
   <!-- Password protection -->
   <script>
     const password = prompt("Please enter the password:");
-    if (password !== "meinpasswort") {
+    if (password !== "chris") {
       document.write("<h1 style='color:red;text-align:center;margin-top:20%;'>❌ Access denied. Wrong password.</h1>");
       throw new Error("Access denied");
     }
@@ -167,20 +167,19 @@
   <p>Used for greedy target assignment. Tunable parameter \( \alpha \in [0,1] \) controls trade-off between proximity and value.</p>
 
   <h3>Drift Simulation</h3>
-  <p>Target positions are simulated externally via OpenDrift. The movement of a vessel is updated at each step using:</p>
+  <p><strong>Plastic patches</strong> are advected with ocean surface currents via OpenDrift:</p>
   <div class="equation">
-    \[ q_k(t+1) = q_k(t) + v_k(t) \cdot u_k(t) \cdot \Delta t + c_k(t) \cdot \Delta t \]
+    \[ p_i(t+1) = p_i(t) + c_i(t) \cdot \Delta t \]
   </div>
-
-
-  <h3>Current & Movement Model</h3>
-  <p>The movement of vessels and hotspots is influenced by ocean currents. These are represented as vector fields \( \vec{u}(x, y, t) \), \( \vec{v}(x, y, t) \) over the 2D sea surface.</p>
-  <p>At each time step \(t\), the position \((x_i, y_i)\) of a hotspot is updated as:</p>
+  <p><strong>Vessel motion</strong> combines propulsion and drift:</p>
   <div class="equation">
-    \[ x_i(t+1) = x_i(t) + u(x_i, y_i, t) \cdot \Delta t \]
-    \[ y_i(t+1) = y_i(t) + v(x_i, y_i, t) \cdot \Delta t \]
+    \[ q_k(t+1) = q_k(t) + v_k \cdot u_k(t) \cdot \Delta t + c_k(t) \cdot \Delta t \]
   </div>
-  <p>Vessels are subject to similar drift, but also have their own propulsion vector added in the planning logic.</p>
+  <ul>
+    <li>\( c_i(t), c_k(t) \): current vector at time \(t\) for target and vessel</li>
+    <li>\( v_k \): vessel cruising speed (constant)</li>
+    <li>\( u_k(t) \): unit vector toward selected target</li>
+  </ul>
 </section>
 
 
