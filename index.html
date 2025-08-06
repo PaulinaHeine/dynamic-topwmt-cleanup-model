@@ -125,14 +125,16 @@
 
 <section id="problem" class="active">
   <h2>📍 Problem Setting</h2>
-  <p>Marine debris tends to accumulate in oceanic convergence zones. These zones contain floating plastic patches—called <strong>hotspots</strong>—that vary in size and drift with ocean currents.</p>
-  <div class="highlight">
-    Objective: <strong>Maximize collected plastic value</strong> within a fixed time horizon by choosing <em>which hotspots to visit</em>, and <em>in what order</em>.
+  <p>Plastic patches ("hotspots") drift with ocean currents. The objective is to maximize collected plastic value within a time horizon using a reactive heuristic. Each hotspot has a position, a value, and follows a drift simulation trajectory.</p>
+  <div class="img-container">
+    <img src="Bildschirmfoto 2025-08-06 um 12.10.13.png" alt="Greedy Strategy Explanation">
+    <p style="font-size:0.9em;color:#555;">Illustration of greedy routing behavior: proximity-only, value-only, and balanced trade-offs.</p>
   </div>
 </section>
+
 <section id="math">
   <h2>📐 Mathematical Model</h2>
-
+  
   <h3>Objective</h3>
   <p>Maximize total collected value over a finite time horizon \( T \):</p>
   <div class="equation">
