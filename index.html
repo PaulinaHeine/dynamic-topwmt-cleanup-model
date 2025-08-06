@@ -35,13 +35,16 @@
       display: flex;
       justify-content: center;
       background: #2c5282;
+      flex-wrap: wrap;
     }
     nav button {
-      padding: 14px 20px;
+      flex: 1 1 33%;
+      min-width: 100px;
+      padding: 14px 10px;
       border: none;
       background: #2c5282;
       color: white;
-      font-size: 16px;
+      font-size: 15px;
       cursor: pointer;
     }
     nav button:hover, nav button.active {
@@ -51,7 +54,7 @@
       display: none;
       max-width: 960px;
       margin: auto;
-      padding: 40px 20px;
+      padding: 20px 10px;
     }
     section.active {
       display: block;
@@ -61,7 +64,7 @@
     }
     .equation {
       text-align: center;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       margin: 20px 0;
     }
     .video-container, .iframe-container {
@@ -92,7 +95,8 @@
       text-align: center;
     }
     .slider-container input[type=range] {
-      width: 300px;
+      width: 100%;
+      max-width: 300px;
     }
     footer {
       background: #2c5282;
@@ -128,17 +132,43 @@
 </section>
 
 <section id="math">
-  <h2>⚙️ Mathematical Model</h2>
-  <p>Each hotspot has a value \( v_i \) and a distance \( d_i \) from the vessel. We define a scoring function to balance both:</p>
+  <h2>📐 Mathematical Model</h2>
+  <p>The vessel routing problem is formalized as a dynamic Team Orienteering Problem with Moving Targets (TOP-MT). The objective is to maximize the total collected value within a fixed time horizon.</p>
+
+  <h3>Score Function</h3>
   <div class="equation">
-    \[ \text{Score}_i = \alpha \cdot \left(1 - \frac{d_i}{d_{\max}}\right) + (1 - \alpha) \cdot \left(\frac{v_i}{v_{\max}}\right) \]
+    \[ 
+    \text{Score}_i = \alpha \cdot \left(1 - \frac{d_i}{d_{\max}}\right) + (1 - \alpha) \cdot \left(\frac{v_i}{v_{\max}}\right) 
+    \]
   </div>
   <ul>
-    <li>\( \alpha \in [0, 1] \): trade-off parameter</li>
-    <li>\( d_i \): distance to hotspot</li>
-    <li>\( v_i \): value of hotspot</li>
+    <li>\( d_i \): distance between the vessel and hotspot \(i\)</li>
+    <li>\( v_i \): value of hotspot \(i\)</li>
+    <li>\( \alpha \in [0,1] \): trade-off parameter</li>
+    <li>\( d_{\max}, v_{\max} \): maximum distance/value in current evaluation window</li>
   </ul>
+
+  <h3>Optimization Objective</h3>
+  <p>The optimization problem is:</p>
+  <div class="equation">
+    \[ \max \sum_{i \in S} v_i \cdot x_i \]
+  </div>
+  <p>Subject to:</p>
+  <ul>
+    <li>\( \sum_{i \in S} t_i \cdot x_i \leq T \): total travel and service time within time budget \(T\)</li>
+    <li>\( x_i \in \{0, 1\} \): binary variable indicating if hotspot \(i\) is visited</li>
+  </ul>
+
+  <h3>Current & Movement Model</h3>
+  <p>The movement of vessels and hotspots is influenced by ocean currents. These are represented as vector fields \( \vec{u}(x, y, t) \), \( \vec{v}(x, y, t) \) over the 2D sea surface.</p>
+  <p>At each time step \(t\), the position \((x_i, y_i)\) of a hotspot is updated as:</p>
+  <div class="equation">
+    \[ x_i(t+1) = x_i(t) + u(x_i, y_i, t) \cdot \Delta t \]
+    \[ y_i(t+1) = y_i(t) + v(x_i, y_i, t) \cdot \Delta t \]
+  </div>
+  <p>Vessels are subject to similar drift, but also have their own propulsion vector added in the planning logic.</p>
 </section>
+
 
 <section id="logic">
   <h2>🧠 Greedy Routing Logic</h2>
