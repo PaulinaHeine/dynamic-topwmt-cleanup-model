@@ -133,31 +133,45 @@
 
 <section id="math">
   <h2>📐 Mathematical Model</h2>
-  <p>The vessel routing problem is formalized as a dynamic Team Orienteering Problem with Moving Targets (TOP-MT). The objective is to maximize the total collected value within a fixed time horizon.</p>
+
+  <h3>Objective</h3>
+  <p>Maximize total collected value over a finite time horizon \( T \):</p>
+  <div class="equation">
+    \[ \max \sum_{t \in T} \sum_{k \in K} \sum_{i \in N_t} \pi_i(t) \cdot x_{i,k}(t) \]
+  </div>
+
+  <h3>Decision Variables</h3>
+  <ul>
+    <li>\( z_{i,k}(t) \in \{0,1\} \): vessel \(k\) targets hotspot \(i\) at time \(t\)</li>
+    <li>\( x_{i,k}(t) = I[ \|q_k(t) - p_i(t)\| \leq \epsilon \wedge z_{i,k}(t) = 1 ] \)</li>
+  </ul>
+
+  <h3>Constraints</h3>
+  <ul>
+    <li>(C1) Each target is collected at most once:<br>
+      \[ \sum_{t \in T} \sum_{k \in K} x_{i,k}(t) \leq 1 \quad \forall i \in \bigcup_t N_t \]</li>
+    <li>(C2) Each vessel selects only one target per time step:<br>
+      \[ \sum_{i \in N_t} z_{i,k}(t) \leq 1 \quad \forall k, t \]</li>
+    <li>(C3) Vessel dynamics with drift:<br>
+      \[ q_k(t+1) = q_k(t) + v_k(t) \cdot u_k(t) \cdot \Delta t + c_k(t) \cdot \Delta t \]</li>
+    <li>(C4) Start from initial position:<br>
+      \[ q_k(0) = q^\text{start}_k \]</li>
+    <li>(C5) Each target can be pursued by at most one vessel:<br>
+      \[ \sum_{k \in K} z_{i,k}(t) \leq 1 \quad \forall i \in N_t, \forall t \]</li>
+  </ul>
 
   <h3>Score Function</h3>
   <div class="equation">
-    \[ 
-    \text{Score}_i = \alpha \cdot \left(1 - \frac{d_i}{d_{\max}}\right) + (1 - \alpha) \cdot \left(\frac{v_i}{v_{\max}}\right) 
-    \]
+    \[ S_i = \alpha \cdot \left(1 - \frac{d_i}{d_{\max}}\right) + (1 - \alpha) \cdot \left(\frac{v_i}{v_{\max}}\right) \]
   </div>
-  <ul>
-    <li>\( d_i \): distance between the vessel and hotspot \(i\)</li>
-    <li>\( v_i \): value of hotspot \(i\)</li>
-    <li>\( \alpha \in [0,1] \): trade-off parameter</li>
-    <li>\( d_{\max}, v_{\max} \): maximum distance/value in current evaluation window</li>
-  </ul>
+  <p>Used for greedy target assignment. Tunable parameter \( \alpha \in [0,1] \) controls trade-off between proximity and value.</p>
 
-  <h3>Optimization Objective</h3>
-  <p>The optimization problem is:</p>
+  <h3>Drift Simulation</h3>
+  <p>Target positions are simulated externally via OpenDrift. The movement of a vessel is updated at each step using:</p>
   <div class="equation">
-    \[ \max \sum_{i \in S} v_i \cdot x_i \]
+    \[ q_k(t+1) = q_k(t) + v_k(t) \cdot u_k(t) \cdot \Delta t + c_k(t) \cdot \Delta t \]
   </div>
-  <p>Subject to:</p>
-  <ul>
-    <li>\( \sum_{i \in S} t_i \cdot x_i \leq T \): total travel and service time within time budget \(T\)</li>
-    <li>\( x_i \in \{0, 1\} \): binary variable indicating if hotspot \(i\) is visited</li>
-  </ul>
+
 
   <h3>Current & Movement Model</h3>
   <p>The movement of vessels and hotspots is influenced by ocean currents. These are represented as vector fields \( \vec{u}(x, y, t) \), \( \vec{v}(x, y, t) \) over the 2D sea surface.</p>
