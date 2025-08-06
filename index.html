@@ -130,7 +130,6 @@
     Objective: <strong>Maximize collected plastic value</strong> within a fixed time horizon by choosing <em>which hotspots to visit</em>, and <em>in what order</em>.
   </div>
 </section>
-
 <section id="math">
   <h2>📐 Mathematical Model</h2>
 
@@ -143,7 +142,7 @@
   <h3>Decision Variables</h3>
   <ul>
     <li>\( z_{i,k}(t) \in \{0,1\} \): vessel \(k\) targets hotspot \(i\) at time \(t\)</li>
-    <li>\( x_{i,k}(t) = I[ \|q_k(t) - p_i(t)\| \leq \epsilon \wedge z_{i,k}(t) = 1 ] \)</li>
+    <li>\( x_{i,k}(t) = I[ \|q_k(t) - p_i(t)\| \leq \epsilon \wedge z_{i,k}(t) = 1 ] \): collection indicator</li>
   </ul>
 
   <h3>Constraints</h3>
@@ -153,7 +152,7 @@
     <li>(C2) Each vessel selects only one target per time step:<br>
       \[ \sum_{i \in N_t} z_{i,k}(t) \leq 1 \quad \forall k, t \]</li>
     <li>(C3) Vessel dynamics with drift:<br>
-      \[ q_k(t+1) = q_k(t) + v_k(t) \cdot u_k(t) \cdot \Delta t + c_k(t) \cdot \Delta t \]</li>
+      \[ q_k(t+1) = q_k(t) + v_k \cdot u_k(t) \cdot \Delta t + c_k(t) \cdot \Delta t \]</li>
     <li>(C4) Start from initial position:<br>
       \[ q_k(0) = q^\text{start}_k \]</li>
     <li>(C5) Each target can be pursued by at most one vessel:<br>
@@ -161,24 +160,44 @@
   </ul>
 
   <h3>Score Function</h3>
+  <p>Used for greedy target assignment. Tunable parameter \( \alpha \in [0,1] \) controls trade-off between proximity and value:</p>
   <div class="equation">
     \[ S_i = \alpha \cdot \left(1 - \frac{d_i}{d_{\max}}\right) + (1 - \alpha) \cdot \left(\frac{v_i}{v_{\max}}\right) \]
   </div>
-  <p>Used for greedy target assignment. Tunable parameter \( \alpha \in [0,1] \) controls trade-off between proximity and value.</p>
+  <ul>
+    <li>\( d_i \): current distance from vessel to target \(i\)</li>
+    <li>\( v_i \): value of target \(i\) (e.g. plastic mass)</li>
+    <li>\( d_{\max}, v_{\max} \): max distance and value across current candidate set (for normalization)</li>
+  </ul>
 
-  <h3>Drift Simulation</h3>
-  <p><strong>Plastic patches</strong> are advected with ocean surface currents via OpenDrift:</p>
+  <h3>Motion Model: Plastic</h3>
+  <p>Hotspots are advected using ocean surface current fields. The position update rule is:</p>
   <div class="equation">
     \[ p_i(t+1) = p_i(t) + c_i(t) \cdot \Delta t \]
   </div>
-  <p><strong>Vessel motion</strong> combines propulsion and drift:</p>
+  <ul>
+    <li>\( p_i(t) \): position of patch \(i\) at time \(t\)</li>
+    <li>\( c_i(t) \): surface current velocity at \( p_i(t) \)</li>
+  </ul>
+
+  <h3>Motion Model: Vessel</h3>
+  <p>Boats are affected by both their propulsion and ocean currents. Movement is updated via:</p>
   <div class="equation">
     \[ q_k(t+1) = q_k(t) + v_k \cdot u_k(t) \cdot \Delta t + c_k(t) \cdot \Delta t \]
   </div>
   <ul>
-    <li>\( c_i(t), c_k(t) \): current vector at time \(t\) for target and vessel</li>
-    <li>\( v_k \): vessel cruising speed (constant)</li>
-    <li>\( u_k(t) \): unit vector toward selected target</li>
+    <li>\( q_k(t) \): position of vessel \(k\)</li>
+    <li>\( u_k(t) \): unit vector pointing from \( q_k(t) \) to current target</li>
+    <li>\( v_k \): vessel's speed in still water</li>
+    <li>\( c_k(t) \): ocean surface current at \( q_k(t) \)</li>
+    <li>\( \Delta t \): simulation time step</li>
+  </ul>
+
+  <h3>Value Assignment</h3>
+  <p>Each hotspot has an assigned value \(v_i\), which can depend on plastic mass, size, and persistence. In our simulation:</p>
+  <ul>
+    <li>Value is proportional to initial patch size</li>
+    <li>Once collected, \( v_i \to 0 \)</li>
   </ul>
 </section>
 
