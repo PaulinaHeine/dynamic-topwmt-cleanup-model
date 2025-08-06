@@ -134,8 +134,15 @@
 
 <section id="math">
   <h2>📐 Mathematical Model</h2>
-  
+
+  <h3>Orienteering Problems</h3>
+  <p>The classic Orienteering Problem (OP) involves selecting a subset of nodes to visit within a given time/budget constraint to maximize collected value. The Team Orienteering Problem (TOP) extends this to multiple agents. We consider a dynamic version (TOP-MT), where targets (hotspots) move over time due to ocean currents.</p>
+
+  <h3>Fleet and Setting</h3>
+  <p>We consider a heterogeneous fleet of vessels with different speeds and potentially differing collection behaviors. Each vessel follows a heuristic strategy to maximize plastic collection.</p>
+
   <h3>Objective</h3>
+  <p>Maximize total collected value over a finite time horizon \( T \):</p>
   <p>Maximize total collected value over a finite time horizon \( T \):</p>
   <div class="equation">
     \[ \max \sum_{t \in T} \sum_{k \in K} \sum_{i \in N_t} \pi_i(t) \cdot x_{i,k}(t) \]
