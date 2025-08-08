@@ -3,50 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dynamic Routing for Marine Debris · Full Site (Advanced + Examples)</title>
-  <meta name="description" content="TOP‑MT for marine debris: advanced model with numbered equations, SOCP/MILP worked example, risk‑aware greedy, media, and interactive demo." />
+  <title>Dynamic Routing for Marine Debris · Greedy + Retargeting (Full Site)</title>
+  <meta name="description" content="Your implemented approach for dynamic routing: α‑weighted greedy selection and practical retargeting. Numbered equations, figures, media, and ready‑to‑use code." />
 
-  <!-- Fonts & Icons -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Ctext y='0.9em' font-size='200'%3E%F0%9F%8C%8A%3C/text%3E%3C/svg%3E"/>
 
-  <!-- MathJax (equation numbering + refs) -->
+  <!-- MathJax with numbering -->
   <script>
     window.MathJax = {
-      tex: {
-        tags: 'all',
-        tagSide: 'right',
-        tagIndent: '0.8em',
-        inlineMath: [['$','$'],['\\(','\\)']],
-        displayMath: [['$$','$$'],['\\[','\\]']]
-      },
-      chtml: {matchFontHeight: false}
+      tex: { tags: 'all', inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+      chtml: { matchFontHeight: false }
     };
   </script>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-  <!-- Chart.js -->
+  <!-- Chart.js for one interactive plot -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
     :root{
-      --bg: #0b1220; --bg-soft:#0f172a; --panel:#0c152b; --text:#e5e7eb; --muted:#9fb3e3;
-      --brand:#60a5fa; --brand-2:#06b6d4; --accent:#22c55e; --line:#1b2a4d; --danger:#ef4444;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --bg:#0b1220; --panel:#0c152b; --text:#e5e7eb; --muted:#9fb3e3; --line:#1b2a4d;
+      --brand:#60a5fa; --brand2:#06b6d4; --shadow:0 10px 30px rgba(0,0,0,.35);
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:
-      radial-gradient(1200px 800px at 80% -10%, rgba(6,182,212,.12), transparent 60%),
-      radial-gradient(1200px 900px at -10% 20%, rgba(59,130,246,.12), transparent 60%), var(--bg);
-      color:var(--text); line-height:1.55}
+    body{margin:0;background:radial-gradient(1200px 800px at 80% -10%, rgba(59,130,246,.12), transparent 60%),radial-gradient(1100px 700px at -10% 30%, rgba(6,182,212,.12), transparent 60%),var(--bg);color:var(--text);font-family:Inter,system-ui;line-height:1.55}
     a{color:var(--brand)}
-    header.hero{padding:60px 16px 20px;text-align:center}
+    header.hero{padding:60px 16px 22px;text-align:center}
     .badge{display:inline-block;padding:.35rem .6rem;border:1px solid #2d3b55;border-radius:999px;color:#c7d2fe;font-weight:600;background:linear-gradient(90deg,rgba(59,130,246,.15),rgba(6,182,212,.15))}
     .title{font-size:clamp(28px,6vw,48px);margin:16px auto 8px;font-weight:800}
-    .subtitle{max-width:980px;margin:0 auto;color:var(--muted)}
+    .subtitle{max-width:1000px;margin:0 auto;color:var(--muted)}
 
     nav.tabs{position:sticky;top:0;z-index:50;backdrop-filter:saturate(160%) blur(8px);background:rgba(10,17,33,.7);border-bottom:1px solid #172036}
     nav.tabs .wrap{max-width:1200px;margin:auto;display:flex;gap:8px;padding:10px}
@@ -58,7 +47,7 @@
     section.active{display:block}
     .grid{display:grid;gap:16px}
     .grid.cols-3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-    .two-col{display:grid;gap:16px;grid-template-columns:1.2fr .8fr}
+    .two-col{display:grid;gap:16px;grid-template-columns:1.15fr .85fr}
     @media (max-width: 920px){.two-col{grid-template-columns:1fr}}
     .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
     .card h3{margin-top:0}
@@ -70,23 +59,23 @@
     pre{background:#0b1429;border:1px solid #203258;border-radius:12px;padding:12px;overflow:auto}
     code{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
     .tag{display:inline-block;padding:.3rem .6rem;border:1px solid #203258;border-radius:999px;color:#b8c7ee;margin:2px;font-size:12px}
-    .pill{background:#0b1326;border:1px solid #1b2a4d;border-radius:14px;padding:14px}
   </style>
 </head>
 <body>
 
 <header class="hero">
-  <div class="badge">Operations Research · Environmental Analytics</div>
+  <div class="badge">Operations Research · Marine Robotics</div>
   <h1 class="title">Dynamic Routing for Marine Debris Collection</h1>
-  <p class="subtitle">Advanced, numbered formulation of the <strong>Team Orienteering Problem with Moving Targets (TOP‑MT)</strong>, a <strong>risk‑aware greedy</strong> heuristic (with code), and a <strong>worked SOCP/MILP example with real numbers</strong>. Media & interactive demo included.</p>
+  <p class="subtitle">Your implemented method: <strong>α‑weighted greedy</strong> selection with <strong>practical retargeting</strong> under drift. Numbered equations, code you can paste, and media.</p>
 </header>
 
 <nav class="tabs" aria-label="Sections">
   <div class="wrap">
     <button data-tab="problem" class="active">📍 Problem</button>
-    <button data-tab="math">📐 Model (Advanced)</button>
-    <button data-tab="example">🧮 Worked Example</button>
-    <button data-tab="code">💻 Code (Greedy, risk‑aware)</button>
+    <button data-tab="model">📐 Model (your implementation)</button>
+    <button data-tab="retarget">🔁 Retargeting</button>
+    <button data-tab="results">📊 Results</button>
+    <button data-tab="code">💻 Code</button>
     <button data-tab="media">🎥 Media</button>
   </div>
 </nav>
@@ -96,9 +85,9 @@
   <section id="problem" class="active">
     <div class="two-col">
       <div class="card">
-        <h2>📍 Setting</h2>
-        <p>Hotspots drift with currents; vessels move with self‑propulsion plus drift. We maximize collected value over a horizon subject to kinematics and non‑overlap constraints. See the formal model in Sec. <a href="#math">2</a>.</p>
-        <div class="tag">Reactive</div><div class="tag">Drift‑aware</div><div class="tag">Risk‑aware</div><div class="tag">MPC/RHC</div>
+        <h2>📍 Problem</h2>
+        <p>Hotspots (plastic patches) drift with surface currents; vessels move with their own propulsion plus drift. The objective is to maximize collected value within a time budget by repeatedly selecting the best next target with an \(\alpha\)-weighted score.</p>
+        <div class="tag">Greedy</div><div class="tag">Reactive</div><div class="tag">Drift‑aware</div><div class="tag">OpenDrift</div>
       </div>
       <div class="card">
         <h3>Illustration</h3>
@@ -107,181 +96,132 @@
     </div>
   </section>
 
-  <!-- ADVANCED MATH -->
-  <section id="math">
+  <!-- MODEL: YOUR IMPLEMENTATION -->
+  <section id="model">
     <div class="card">
-      <h2>2. Advanced model (numbered)</h2>
-      <p>Hotspot advection as Itô SDE; vessel kinematics with optional Dubins heading. Observations build Gaussian beliefs; we optimize a risk‑aware objective with chance constraints, then decompose via MPC.</p>
-
-      <p><strong>Hotspot SDE.</strong> For hotspot $i$ with position $p_i(t)$:</p>
-      <div class="equation">\begin{equation}\label{eq:sde}
-        d\,p_i(t)=c\big(p_i(t),t\big)\,dt+\Sigma_c^{1/2}\!(p_i(t),t)\,dW_i(t),\quad p_i(0)=p_i^0 .
+      <h2>📐 1. Discrete model (as implemented)</h2>
+      <p>Time steps \(t=0,1,\dots,\mathcal T\) with step size \(\Delta t\). For vessel \(k\) and hotspot \(i\):</p>
+      <div class="equation">\begin{equation}\label{eq:boat}
+        q_k(t{+}1) = q_k(t) + v_k\, u_k(t)\, \Delta t + c\big(q_k(t), t\big)\, \Delta t\,,\qquad \lVert u_k(t)\rVert_2=1.
       \end{equation}</div>
-
-      <p><strong>Vessel kinematics.</strong> With control $u_k(t)$, $\|u_k\|\le 1$:</p>
-      <div class="equation">\begin{equation}\label{eq:kin}
-        d\,q_k(t)=\big(v_k u_k(t)+c(q_k(t),t)\big)\,dt,\quad q_k(0)=q_k^0 .
+      <div class="equation">\begin{equation}\label{eq:patch}
+        p_i(t{+}1) = p_i(t) + c\big(p_i(t), t\big)\, \Delta t\,.
       \end{equation}</div>
-
-      <p><strong>Observation model and belief update.</strong> At $t_m=m\,\Delta t$:</p>
-      <div class="equation">\begin{equation}\label{eq:obs}
-        y_i(t_m)=H\,p_i(t_m)+\eta_i(t_m),\qquad \eta_i\sim\mathcal N(0,R) .
+      <p>Collection if within radius \(\varepsilon\):</p>
+      <div class="equation">\begin{equation}\label{eq:collect}
+        x_{i,k}(t) := \mathbf{1}\{\lVert q_k(t)-p_i(t)\rVert_2 \le \varepsilon\}\;\Rightarrow\; v_i\leftarrow 0,\ i\text{ deactivated.}
       \end{equation}</div>
+    </div>
 
-      <p><strong>Risk‑aware objective.</strong> CVaR with fuel penalty over horizon $[0,T]$:</p>
-      <div class="equation">\begin{equation}\label{eq:cvar}
-        \max\ \operatorname{CVaR}_{\beta}\!\left(\sum_{i,k} \pi_i\big(\tau_{i,k}\big)\,x_{i,k}\right)-\lambda\,\mathbb E[\text{Fuel}(u)] .
-      \end{equation}</div>
-
-      <p><strong>Chance constraints.</strong> Capture and separation (Gaussian beliefs):</p>
-      <div class="equation">\begin{equation}\label{eq:chance}
-        \mathbb P\big(\|q_k(\tau_{i,k})-p_i(\tau_{i,k})\|\le \varepsilon\big)\ge 1-\alpha_i,\qquad \mathbb P\big(\|q_k(t)-q_{k'}(t)\|\ge d_{\min}\big)\ge 1-\rho .
-      \end{equation}</div>
-
-      <p>Under Gaussian beliefs, \eqref{eq:chance} admits SOC surrogates using Mahalanobis radii $r_{1-\alpha}$; see the worked example in Sec. <a href="#example">3</a>.</p>
-
-      <p><strong>Greedy score (dual view).</strong> A one‑step Lagrangian relaxation yields</p>
+    <div class="card">
+      <h2>📏 2. Greedy score (distance–value)</h2>
+      <p>For the active candidate set at time \(t\):</p>
       <div class="equation">\begin{equation}\label{eq:score}
-        S_{i,k}=\alpha\,\phi_{\text{dist}}+ (1-\alpha)\,\phi_{\text{value}} - \lambda\,\phi_{\text{risk}}-\gamma\,\phi_{\text{fuel}} ,
+        S_{i,k}(t) = \alpha\Big(1 - \tfrac{d_{i,k}(t)}{d_{\max}(t)}\Big) + (1-\alpha)\,\tfrac{v_i}{v_{\max}(t)}\,,\qquad \alpha\in[0,1].
       \end{equation}</div>
-      <p>whose concrete normalized form is given in \eqref{eq:score-concrete} and implemented in Sec. <a href="#code">4</a>.</p>
-
-      <p><strong>Closed‑form intercept proxy.</strong> With constant current $c$ and speed $v$ (pure pursuit), the intercept time is</p>
-      <div class="equation">\begin{equation}\label{eq:tstar}
-        T^*=\frac{\|r^0\|}{v-c\cos\theta},\quad \cos\theta=\frac{\langle r^0,c\rangle}{\|r^0\|\,\|c\|} .
+      <p>Non‑overlap pursuit (one target per vessel and time; each target pursued by at most one vessel):</p>
+      <div class="equation">\begin{equation}\label{eq:nonoverlap}
+        \sum_k z_{i,k}(t) \le 1,\qquad \sum_i z_{i,k}(t) \le 1,\qquad z_{i,k}(t)\in\{0,1\}.
       \end{equation}</div>
     </div>
   </section>
 
-  <!-- WORKED EXAMPLE -->
-  <section id="example">
+  <!-- RETARGETING -->
+  <section id="retarget">
     <div class="card">
-      <h2>3. Worked example: SOCP capture + MILP assignment (real numbers)</h2>
-      <p>This toy instance shows (i) a <em>single</em> capture chance constraint cast as SOCP, and (ii) a tiny MILP for non‑overlap assignment. Numbers are small but realistic.</p>
-
-      <h3>3.1 SOCP: probabilistic capture</h3>
-      <p>At $t=30\,\text{s}$, vessel $k$ predicted position mean $q_k(30)=(120,\ 40)$ (m). Hotspot $i$ belief is Gaussian with mean $\mu_i(30)=(130,\ 50)$ and covariance $\Sigma_i(30)=\begin{bmatrix} 36 & 6 \\ 6 & 25 \end{bmatrix}$ (m$^2$). Capture radius $\varepsilon=8$ m, required success $1-\alpha_i=0.9$.</p>
-      <p>The Gaussian chance constraint in \eqref{eq:chance} reduces to the SOC condition</p>
-      <div class="equation">\begin{equation}\label{eq:soc}
-        \| q_k(30)-\mu_i(30) \|_{\Sigma_i(30)^{-1}}\;\le\; r_{0.9}\, ,
+      <h2>🔁 Retargeting rule (your code)</h2>
+      <p>While vessel \(k\) tracks target \(j\), allow switching to \(i\) if its score is sufficiently better by a hysteresis \(\delta>0\):</p>
+      <div class="equation">\begin{equation}\label{eq:retarget}
+        S_{i,k}(t) \ge S_{j,k}(t) + \delta \;\Rightarrow\; \text{switch target to } i.
       \end{equation}</div>
-      <p>with $r_{0.9}=\sqrt{\chi^2_{2;0.9}}\approx 2.146$. Compute the left‑hand side:</p>
-      <div class="equation">\[
-        q-\mu=(\!-10,\!-10),\quad \Sigma^{-1}=\frac{1}{(36)(25)-6^2}\begin{bmatrix}25 & -6\\ -6 & 36\end{bmatrix}=\begin{bmatrix}0.0298 & -0.0071\\ -0.0071 & 0.0426\end{bmatrix}.
-      \]</div>
-      <p>Mahalanobis distance $d_M=\sqrt{(q-\mu)^\top\Sigma^{-1}(q-\mu)}=\sqrt{(\!-10,\!-10)\begin{bmatrix}0.0298 & -0.0071\\ -0.0071 & 0.0426\end{bmatrix}\begin{bmatrix}\!-10\\\!-10\end{bmatrix}}\approx 2.06$.</p>
-      <p>Since $2.06\le 2.146$, the chance constraint is <strong>feasible</strong> at $t=30$ s. (If desired, tighten by requiring $d_M\le r_{0.9}-\varepsilon/\bar\sigma$ to fold in $\varepsilon$ conservatively.)</p>
-
-      <h3>3.2 MILP: tiny assignment</h3>
-      <p>Two vessels $k\in\{1,2\}$; three hotspots $i\in\{A,B,C\}$. Value $v=[A:90, B:65, C:40]$. Interception times (s) estimated by \eqref{eq:tstar} and then converted to costs $c_{i,k}=t_{i,k}$:</p>
-      <div class="equation">\[ C=\begin{bmatrix}
-        22 & 35\\
-        28 & 18\\
-        40 & 26
-      \end{bmatrix}\quad (\text{rows }A,B,C;\ \text{cols }k=1,2). \]</div>
-      <p>Binary decision $x_{i,k}\in\{0,1\}$, each hotspot collected at most once; each vessel collects at most one target:</p>
-      <div class="equation">\begin{equation}\label{eq:milp}
-        \max\ \sum_{i,k} v_i x_{i,k} - \eta\sum_{i,k} c_{i,k} x_{i,k}\quad \text{s.t.}\ \sum_k x_{i,k}\le 1,\ \sum_i x_{i,k}\le 1,\ x\in\{0,1\} .
-      \end{equation}</div>
-      <p>Take $\eta=1$ (value per second). Enumerating feasible matchings gives the optimum $x_{A,1}=1, x_{B,2}=1$ (value $90+65=155$, time $22+18=40$, score $115$), better than any matching involving $C$.</p>
-      <p class="muted">This mirrors the <em>auction</em> step used for conflict resolution in the greedy policy; see \eqref{eq:score-concrete} for the per‑edge score.</p>
+      <p>Practical guards: minimum binding time, angle/side‑distance filter (only near‑path candidates), and per‑step reevaluation frequency.</p>
+    </div>
+    <div class="card">
+      <h3>Why retargeting improves yield (sketch)</h3>
+      <p>If a near‑path target \(i\) offers \(S_{i,k}(t)\ge S_{j,k}(t)+\delta\) and \(d_{i,k}(t)+d_{i\to j}(t)\approx d_{j,k}(t)\), then collecting \(i\) first increases cumulative value with negligible delay to \(j\). The hysteresis \(\delta\) ensures only clearly beneficial switches occur.</p>
     </div>
   </section>
 
-  <!-- CODE (RISK-AWARE GREEDY) -->
+  <!-- RESULTS (alpha figure + toy chart) -->
+  <section id="results">
+    <div class="card">
+      <h2>📊 Results snapshot</h2>
+      <div class="grid cols-3">
+        <div class="card" style="grid-column:1/-1">
+          <h3>Alpha comparison figure</h3>
+          <div class="media"><img src="AlphaVgl.png" alt="Alpha comparison" style="object-fit:cover"/></div>
+        </div>
+        <div class="card" style="grid-column:1/-1">
+          <h3>Interactive α toy curve</h3>
+          <input id="alphaRange2" type="range" min="0" max="1" step="0.01" value="0.8" oninput="updateAlpha2(this.value)" style="width:100%"/>
+          <p>α = <strong><span id="alphaValue2">0.80</span></strong></p>
+          <canvas id="alphaChart2" aria-label="toy alpha"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CODE -->
   <section id="code">
     <div class="card">
-      <h2 id="code-title">4. Risk‑aware greedy: drop‑in Python</h2>
-      <p>This snippet mirrors Eq. \eqref{eq:score-concrete} and can replace your current scoring in <code>greedy.py</code> / <code>Boat.py</code>. It normalizes distance/value/risk/fuel over the current candidate pool and supports optional <em>retargeting</em>.</p>
-      <div class="equation">\begin{equation}\label{eq:score-concrete}
-        S_{i,k}=\alpha\Big(1-\tfrac{\hat d_{i,k}}{d_{\max}}\Big) + (1-\alpha)\tfrac{\pi_i(t)}{\pi_{\max}} - \lambda\,\tfrac{r_{1-\alpha_i}(\Sigma_i)}{r_{\max}} - \gamma\,\tfrac{E_{i,k}}{E_{\max}}\, .
-      \end{equation}</div>
-
-      <pre><code class="language-python"># ---------- risk_aware_score.py (drop-in) ----------
-from math import sqrt
+      <h2>💻 Paste‑ready code (matches your implementation)</h2>
+      <p>Drop these functions into your <code>greedy.py</code>/<code>Boat.py</code>. They implement Eq. \eqref{eq:score} and \eqref{eq:retarget}.</p>
+      <pre><code class="language-python"># ---------- greedy_score_and_retarget.py ----------
 import numpy as np
 
-CHI2_Q = {  # chi^2 quantiles for df=2 (approx.)
-    0.80: 1.794, 0.85: 1.998, 0.90: 2.146, 0.95: 2.447, 0.975: 2.807, 0.99: 3.034
-}
+# distance + value score with alpha trade-off (Eq. (\ref{eq:score}))
+def greedy_scores_alpha(q_k, targets_pos, targets_val, alpha=0.8):
+    """q_k: np.array([x,y]);
+    targets_pos: dict[id -> np.array([x,y])];
+    targets_val: dict[id -> float]"""
+    if not targets_pos:
+        return {}
+    dists = {i: float(np.linalg.norm(targets_pos[i] - q_k)) for i in targets_pos}
+    d_max = max(dists.values()) or 1.0
+    v_max = max((targets_val[i] for i in targets_pos), default=1.0) or 1.0
+    scores = {
+        i: float(alpha * (1.0 - dists[i] / d_max) + (1.0 - alpha) * (targets_val[i] / v_max))
+        for i in targets_pos
+    }
+    return scores
 
-def mahalanobis_radius(cov: np.ndarray, conf: float = 0.90) -> float:
-    """Return r_{conf} for 2D Gaussian belief (SOC surrogate)."""
-    return sqrt(CHI2_Q.get(conf, 2.146))
+# hysteresis-based retargeting (Eq. (\ref{eq:retarget}))
+def select_or_retarget(current_target, scores, delta=0.05):
+    if not scores:
+        return None
+    best = max(scores, key=scores.get)
+    if current_target is None:
+        return best
+    return best if scores[best] >= scores.get(current_target, -1e9) + delta else current_target
 
-def intercept_proxy(q, p, c_vec, v):
-    """Closed-form T* from Eq. (tstar) with constant current approximation."""
-    r0 = np.array(p) - np.array(q)
-    c = np.array(c_vec)
-    r0_norm = np.linalg.norm(r0) + 1e-9
-    c_norm = np.linalg.norm(c)
-    cos_th = float(np.dot(r0, c)) / (r0_norm * (c_norm + 1e-12)) if c_norm > 0 else 0.0
-    denom = max(v - c_norm * cos_th, 1e-6)
-    return r0_norm / denom
+# steering towards target with drift (Eq. (\ref{eq:boat}))
+def step_with_drift(q_k, v_k, target_pos, dt, current_at):
+    if target_pos is None:
+        return q_k
+    direction = target_pos - q_k
+    norm = np.linalg.norm(direction) + 1e-12
+    u_k = direction / norm
+    drift = np.array(current_at(q_k[0], q_k[1]))
+    return q_k + v_k * u_k * dt + drift * dt
 
-def risk_aware_scores(vessel_k, candidates, params):
-    """
-    vessel_k: dict with keys {"q":(x,y), "v":speed, "fuel_rate":float}
-    candidates: list of dicts, each with keys
-      {"id":i, "mu":(x,y), "Sigma":2x2 array, "value":float, "alpha_i":0.10}
-      and environment field c_at(x,y) -> (cx,cy)
-    params: {"alpha":0.8, "lambda":0.3, "gamma":0.1, "conf":0.90, "c_fun":callable}
-    returns: list of (id, S)
-    """
-    alpha = params.get("alpha", 0.8)
-    lam   = params.get("lambda", 0.3)
-    gam   = params.get("gamma", 0.1)
-    conf  = params.get("conf", 0.90)
-    c_fun = params["c_fun"]
-
-    # Precompute raw metrics
-    raw = []
-    for cand in candidates:
-        mu = np.array(cand["mu"])    # mean target position
-        Sigma = np.array(cand["Sigma"])  # 2x2 cov
-        value = float(cand["value"])
-        c_here = np.array(c_fun(*mu))
-        d_hat = intercept_proxy(vessel_k["q"], mu, c_here, vessel_k["v"])  # Eq. (tstar)
-        r_quant = mahalanobis_radius(Sigma, conf)                              # SOC radius
-        E = d_hat * max(vessel_k.get("fuel_rate", 1.0), 1e-6)                # simple energy proxy
-        raw.append((cand["id"], d_hat, value, r_quant, E))
-
-    # Normalizers (avoid divide-by-zero)
-    d_max = max(x[1] for x in raw) or 1.0
-    v_max = max(x[2] for x in raw) or 1.0
-    r_max = max(x[3] for x in raw) or 1.0
-    e_max = max(x[4] for x in raw) or 1.0
-
-    out = []
-    for (cid, d_hat, val, r_q, E) in raw:
-        S = (
-            alpha * (1.0 - d_hat / d_max)
-            + (1.0 - alpha) * (val / v_max)
-            - lam * (r_q / r_max)
-            - gam * (E / e_max)
-        )
-        out.append((cid, float(S)))
-    out.sort(key=lambda t: t[1], reverse=True)
-    return out
-
-# Example usage
-if __name__ == "__main__":
-    vessel = {"q": (100.0, 40.0), "v": 2.2, "fuel_rate": 1.0}
-    def c_fun(x,y):
-        return (0.25, 0.05)  # constant current for demo
-    candidates = [
-        {"id":"A", "mu":(130.0, 50.0), "Sigma":[[36,6],[6,25]], "value":90, "alpha_i":0.10},
-        {"id":"B", "mu":(116.0, 42.0), "Sigma":[[16,0],[0,16]], "value":65, "alpha_i":0.10},
-        {"id":"C", "mu":(150.0, 20.0), "Sigma":[[49,7],[7,49]], "value":40, "alpha_i":0.10},
-    ]
-    scores = risk_aware_scores(vessel, candidates, {"alpha":0.8, "lambda":0.25, "gamma":0.1, "conf":0.90, "c_fun":c_fun})
-    print(scores)  # [('A', ...), ('B', ...), ('C', ...)]
+# collection check (Eq. (\ref{eq:collect}))
+def collected(q_k, p_i, eps):
+    return float(np.linalg.norm(q_k - p_i)) <= float(eps)
 </code></pre>
 
-      <p class="muted">Hook: in your loop where you compute target scores, call <code>risk_aware_scores(...)</code> instead of the plain distance/value mix. To allow <em>retargeting</em>, recompute every decision step and switch if the top candidate changes by a margin.</p>
+      <h3>Typical integration pattern</h3>
+      <pre><code class="language-python"># inside your simulation loop
+scores = greedy_scores_alpha(q_k, targets_pos, targets_val, alpha)
+current_target = select_or_retarget(current_target, scores, delta)
+q_k = step_with_drift(q_k, v_k, targets_pos.get(current_target), dt, current_at)
+if current_target is not None and collected(q_k, targets_pos[current_target], eps):
+    # mark target as collected: set value to 0, remove from candidate set, etc.
+    targets_val[current_target] = 0.0
+    targets_pos.pop(current_target, None)
+    current_target = None
+</code></pre>
 
-      <h3>4.1 Conflict resolution (mini‑MILP)</h3>
-      <p>When multiple vessels select the same target, solve the 1‑step MILP in \eqref{eq:milp} over the current candidate set (or run a sealed‑bid auction with bids $S_{i,k}$). The winner takes the target; others pick the next best.</p>
+      <p class="muted">Rename variables to your project’s names if needed (e.g., <code>boat.q</code>, <code>boat.v</code>, <code>current_reader</code>). The logic is identical to your implementation.</p>
     </div>
   </section>
 
@@ -289,7 +229,7 @@ if __name__ == "__main__":
   <section id="media">
     <div class="two-col">
       <div class="card">
-        <h2>🎥 Simulation Video</h2>
+        <h2>🎥 Simulation video</h2>
         <div class="media">
           <video controls>
             <source src="neu.mov" type="video/mp4" />
@@ -323,6 +263,28 @@ if __name__ == "__main__":
     window.scrollTo({top: document.querySelector('nav.tabs').offsetTop, behavior:'smooth'});
   }
   window.addEventListener('load', ()=>{ const h = location.hash.replace('#',''); if(h && document.getElementById(h)) activateTab(h); });
+
+  // Toy alpha plot
+  let chart2;
+  function initAlphaChart2(){
+    const ctx = document.getElementById('alphaChart2');
+    if(!ctx) return;
+    const labels = Array.from({length:21},(_,i)=> (i/20).toFixed(2));
+    const base = labels.map(x=> toyValue(+x));
+    chart2 = new Chart(ctx, { type:'line', data:{labels, datasets:[{label:'toy value', data:base, tension:.35}]}, options:{plugins:{legend:{display:false}}, scales:{x:{title:{display:true,text:'alpha'}}, y:{title:{display:true,text:'value (arb.)'}}}} });
+  }
+  function toyValue(a){
+    const peak = 0.8; const width = 0.45; const base = Math.exp(-Math.pow((a-peak)/width,2));
+    return Math.round((0.7 + 0.35*base + 0.02*Math.sin(10*a))*1000)/1;
+  }
+  function updateAlpha2(a){
+    const v = (+a).toFixed(2);
+    document.getElementById('alphaValue2').textContent = v;
+    if(!chart2) return;
+    chart2.data.datasets[0].data = chart2.data.labels.map(l=> toyValue(parseFloat(l)));
+    chart2.update('none');
+  }
+  window.addEventListener('load', initAlphaChart2);
 </script>
 
 </body>
