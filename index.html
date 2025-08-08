@@ -1,215 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dynamic Routing for Marine Debris · Greedy + Retargeting</title>
-  <meta name="description" content="Clean, copy‑paste site of your implemented method: α‑weighted greedy selection with simple retargeting. Includes data explanation, equations, slider, media, and comments." />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Routing for Marine Debris Collection</title>
+  
+  <!-- Password protection (same as your original) -->
+  <script>
+    const password = prompt("Please enter the password:");
+    if (password !== "chris+ina") {
+      document.write("<h1 style='color:red;text-align:center;margin-top:20%;'>❌ Access denied. Wrong password.</h1>");
+      throw new Error("Access denied");
+    }
+  </script>
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- MathJax for equations (simple numbering) -->
-  <script>window.MathJax={tex:{tags:'all',inlineMath:[["$","$"],["\\(","\\)"]],displayMath:[["$$","$$"],["\\[","\\]"]]},chtml:{matchFontHeight:false}};</script>
+  <!-- MathJax for equations -->
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <style>
-    :root{--bg:#0b1220;--panel:#0c152b;--text:#e5e7eb;--muted:#9fb3e3;--line:#1b2a4d;--brand:#60a5fa}
-    *{box-sizing:border-box}
-    body{margin:0;background:radial-gradient(1200px 800px at 80% -10%, rgba(96,165,250,.12), transparent 60%),radial-gradient(1000px 700px at -10% 30%, rgba(14,165,233,.12), transparent 60%),var(--bg);color:var(--text);font-family:Inter,system-ui;line-height:1.55}
-    a{color:var(--brand)}
-    header.hero{padding:56px 16px 18px;text-align:center}
-    .title{font-size:clamp(28px,6vw,48px);margin:0 0 8px;font-weight:800}
-    .subtitle{max-width:980px;margin:0 auto;color:var(--muted)}
-
-    nav.tabs{position:sticky;top:0;z-index:10;backdrop-filter:saturate(160%) blur(8px);background:rgba(10,17,33,.7);border-bottom:1px solid #172036}
-    nav.tabs .wrap{max-width:1200px;margin:auto;display:flex;gap:8px;padding:10px}
-    nav.tabs button{flex:1 1 auto;min-width:120px;background:#0d162b;color:#bcd1ff;border:1px solid #1a2540;padding:12px;border-radius:10px;cursor:pointer;font-weight:700}
-    nav.tabs button.active{background:linear-gradient(135deg,rgba(59,130,246,.3),rgba(6,182,212,.3));border-color:#23406e}
-
-    main{max-width:1200px;margin:0 auto;padding:22px 16px 80px}
-    section{display:none}
-    section.active{display:block}
-    .grid{display:grid;gap:16px}
-    .two-col{display:grid;gap:16px;grid-template-columns:1.15fr .85fr}
-    @media (max-width: 920px){.two-col{grid-template-columns:1fr}}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
-    .equation{background:#0b1429;border:1px dashed #203258;border-radius:12px;padding:10px 12px;margin:10px 0}
-    .media{position:relative;width:100%;overflow:hidden;border-radius:16px;border:1px solid #213357;background:#0a1326}
-    .media::after{content:"";display:block;padding-bottom:56.25%}
-    .media>*{position:absolute;inset:0;width:100%;height:100%;border:0}
-    pre{background:#0b1429;border:1px solid #203258;border-radius:12px;padding:12px;overflow:auto}
-    .muted{color:var(--muted)}
-    .tag{display:inline-block;padding:.3rem .6rem;border:1px solid #203258;border-radius:999px;color:#b8c7ee;margin:2px;font-size:12px}
+    :root{--blue:#2c5282;--blue2:#4a6483;--ink:#1a202c;--bg:#f9f9fb}
+    body {margin:0;font-family:Segoe UI, system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;background:var(--bg);color:var(--ink)}
+    header, footer {background:var(--blue);color:white;text-align:center;padding:20px}
+    nav {display:flex;flex-wrap:wrap;background:var(--blue);justify-content:center}
+    nav button {flex:1 1 33%;min-width:120px;padding:14px;border:none;background:var(--blue);color:white;cursor:pointer}
+    nav button:hover, nav button.active {background:var(--blue2)}
+    section {display:none;max-width:1000px;margin:auto;padding:20px}
+    section.active {display:block}
+    h2 {color:var(--blue)}
+    .equation {text-align:center;font-size:1.06rem;margin:18px 0}
+    .video-container, .iframe-container {position:relative;width:100%;padding-bottom:56.25%;height:0;margin:20px 0}
+    .video-container video, .iframe-container iframe {position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+    .highlight {background:#edf2f7;padding:10px;border-left:4px solid #4299e1;margin:16px 0}
+    .slider-container {margin:24px 0;text-align:center}
+    .slider-container input[type=range] {width:100%;max-width:360px}
+    ul.inline li{margin:6px 0}
   </style>
 </head>
 <body>
 
-<header class="hero">
-  <h1 class="title">Dynamic Routing for Marine Debris</h1>
-  <p class="subtitle">Your implemented approach: <strong>α‑weighted greedy</strong> selection with <strong>simple retargeting</strong> under ocean drift. Clean, minimal math and practical explanations.</p>
+<header>
+  <h1>Dynamic Routing for Marine Debris Collection</h1>
+  <p>Optimizing vessel paths in dynamic ocean environments with drifting plastic hotspots</p>
 </header>
 
-<nav class="tabs" aria-label="Sections">
-  <div class="wrap">
-    <button data-tab="problem" class="active">📍 Problem</button>
-    <button data-tab="math">📐 Math</button>
-    <button data-tab="logic">🧠 Logic</button>
-    <button data-tab="comparison">📊 Comparison</button>
-    <button data-tab="video">🎥 Video</button>
-    <button data-tab="paper">📄 Paper</button>
-    <button data-tab="comments">💬 Comments</button>
-  </div>
+<nav>
+  <button onclick="showTab('problem')" class="active">📍 Problem</button>
+  <button onclick="showTab('math')">📐 Math & Optimization</button>
+  <button onclick="showTab('logic')">🧠 Logic</button>
+  <button onclick="showTab('comparison')">📊 Comparison</button>
+  <button onclick="showTab('video')">🎥 Video</button>
+  <button onclick="showTab('paper')">📄 Paper</button>
+  <button onclick="showTab('comments')">💬 Comments</button>
 </nav>
 
-<main>
-  <!-- PROBLEM -->
-  <section id="problem" class="active">
-    <div class="two-col">
-      <div class="card">
-        <h2>📍 Problem description</h2>
-        <p>Plastic hotspots drift with surface currents. We control one or more vessels that move with their own speed plus drift. Each hotspot has a position and a value (proportional to mass/size). Goal: maximize total collected value within the simulation horizon.</p>
-        <div class="tag">Greedy</div><div class="tag">Reactive</div><div class="tag">OpenDrift currents</div><div class="tag">No depot</div>
-      </div>
-      <div class="card">
-        <h3>Figure</h3>
-        <div class="media"><img src="Bildschirmfoto 2025-08-06 um 12.10.13.png" alt="Greedy trade‑offs" style="object-fit:cover"></div>
-        <p class="muted">Proximity‑only vs value‑only vs a balanced α mix.</p>
-      </div>
-    </div>
-  </section>
+<section id="problem" class="active">
+  <h2>📍 Problem Setting</h2>
+  <p>Plastic hotspots drift with ocean currents. The goal is to maximize collected value within a given time horizon using a reactive, greedy heuristic. Each hotspot has a position, a value, and a drift trajectory.</p>
+  <div class="highlight"><strong>How hotspots are created.</strong> Hotspots are <em>clustered debris areas</em>: we seed many simulated particles (floating plastic) across the surface and **cluster** them by spatial proximity to obtain compact regions of high density. A hotspot’s <em>initial position</em> is the cluster centroid; its <em>value</em> is proportional to cluster size (number of particles/mass). After collection by a vessel, the hotspot’s value is set to 0 and it is removed from the active set.</div>
+  <img src="hotspot_example.png" alt="Hotspot example" style="max-width:100%"/>
+</section>
 
-  <!-- MATH -->
-  <section id="math">
-    <div class="card">
-      <h2>📐 Math (α‑score, motion, retargeting)</h2>
-      <p><strong>Motion (discrete time):</strong></p>
-      <div class="equation">\( q_k(t{+}1) = q_k(t) + v_k u_k(t) \Delta t + c(q_k(t),t) \Delta t \)</div>
-      <div class="equation">\( p_i(t{+}1) = p_i(t) + c(p_i(t),t) \Delta t \)</div>
-      <p><strong>Collection rule:</strong> collected when \(\lVert q_k(t)-p_i(t)\rVert \le \varepsilon\); then value \(v_i \to 0\) and hotspot is removed.</p>
-      <p><strong>Greedy score (normalized):</strong></p>
-      <div class="equation">\( S_i = \alpha\Big(1 - \tfrac{d_i}{d_{\max}}\Big) + (1-\alpha)\Big(\tfrac{v_i}{v_{\max}}\Big) \)</div>
-      <p><strong>Retargeting (simple rule):</strong> while tracking target \(j\), switch to \(i\) if \(S_i \ge S_j + \delta\). Add a minimum binding time to avoid oscillations.</p>
-      <h3>Data explained</h3>
-      <ul>
-        <li><strong>Currents:</strong> surface current vectors from your OpenDrift reader at vessel/patch positions.</li>
-        <li><strong>Values:</strong> proportional to initial patch size (fixed per hotspot in the run).</li>
-        <li><strong>Parameters:</strong> \(\alpha\in[0,1]\) trade‑off; \(\delta\in[0,0.2]\) hysteresis; \(\varepsilon\) collection radius; \(\Delta t\) time step.</li>
-      </ul>
-    </div>
-  </section>
+<section id="math">
+  <h2>📐 Math & Optimization Model</h2>
 
-  <!-- LOGIC -->
-  <section id="logic">
-    <div class="card">
-      <h2>🧠 Greedy logic</h2>
-      <ol>
-        <li>Compute score for all active hotspots</li>
-        <li>Select best; if already tracking another, apply retargeting rule</li>
-        <li>Move towards current target with drift</li>
-        <li>Collect if within radius; remove and repeat</li>
-      </ol>
-      <div class="equation"><em>Tip:</em> Recompute every step for reactive behaviour; or less often for smoother tracks.</div>
-      <h3>α slider (visual only)</h3>
-      <label for="alphaRange">Adjust α: <strong><span id="alphaValue">0.50</span></strong></label>
-      <input id="alphaRange" type="range" min="0" max="1" step="0.01" value="0.5" oninput="updateAlpha(this.value)" style="width:100%"/>
-    </div>
-  </section>
+  <h3>Motion (discrete time)</h3>
+  <div class="equation">\[ p_i(t+1) = p_i(t) + c\big(p_i(t),t\big)\,\Delta t \]</div>
+  <div class="equation">\[ q_k(t+1) = q_k(t) + v_k\,u_k(t)\,\Delta t + c\big(q_k(t),t\big)\,\Delta t \]</div>
+  <ul class="inline">
+    <li>\(p_i(t)\): hotspot \(i\) position at time \(t\); current field \(c(\cdot,t)\) from reader.</li>
+    <li>\(q_k(t)\): vessel \(k\) position; \(u_k(t)\) unit vector towards current target; \(v_k\) vessel speed.</li>
+  </ul>
 
-  <!-- COMPARISON -->
-  <section id="comparison">
-    <div class="card">
-      <h2>📊 Alpha comparison</h2>
-      <div class="media"><img src="AlphaVgl.png" alt="Alpha comparison" style="object-fit:cover"></div>
-    </div>
-  </section>
+  <h3>Greedy score (your implementation)</h3>
+  <div class="equation">\[ S_{i,k}(t) = \alpha\Big(1 - \tfrac{d_{i,k}(t)}{d_{\max}(t)}\Big) + (1-\alpha)\,\tfrac{v_i}{v_{\max}(t)}\,,\quad \alpha\in[0,1] \]</div>
+  <p>Here \(d_{i,k}(t)=\lVert q_k(t)-p_i(t)\rVert\) and \(v_i\) is the hotspot’s value. Scores are normalized over the current candidate set.</p>
 
-  <!-- VIDEO -->
-  <section id="video">
-    <div class="card">
-      <h2>🎥 Simulation video</h2>
-      <div class="media">
-        <video controls>
-          <source src="neu.mov" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-      </div>
-    </div>
-  </section>
+  <h3>Optimization model (time-expanded, high-level)</h3>
+  <p>This formal model summarizes the routing objective and constraints your greedy policy approximates.</p>
+  <div class="equation">\[ \max \sum_{t\in T} \sum_{k\in K} \sum_{i\in N_t} \pi_i\,(t)\, x_{i,k}(t) \]</div>
+  <p><strong>Decision variables.</strong></p>
+  <ul class="inline">
+    <li>\(z_{i,k}(t)\in\{0,1\}\): vessel \(k\) <em>targets</em> hotspot \(i\) at time \(t\)</li>
+    <li>\(x_{i,k}(t)\in\{0,1\}\): vessel \(k\) <em>collects</em> hotspot \(i\) at time \(t\)</li>
+  </ul>
+  <p><strong>Constraints.</strong></p>
+  <ul>
+    <li>(C1) Unique collection per hotspot: <span class="equation">\( \sum_{t\in T}\sum_{k\in K} x_{i,k}(t) \le 1 \quad \forall i \)</span></li>
+    <li>(C2) One target per vessel per step: <span class="equation">\( \sum_{i\in N_t} z_{i,k}(t) \le 1 \quad \forall k, t \)</span></li>
+    <li>(C3) Non-overlap pursuit: <span class="equation">\( \sum_{k\in K} z_{i,k}(t) \le 1 \quad \forall i\in N_t, t \)</span></li>
+    <li>(C4) Kinematics consistency (pursue implies heading): <span class="equation">\( z_{i,k}(t)=1 \Rightarrow u_k(t) \propto p_i(t)-q_k(t) \)</span></li>
+    <li>(C5) Collection rule: <span class="equation">\( x_{i,k}(t)=1 \Rightarrow \lVert q_k(t)-p_i(t)\rVert \le \varepsilon \)</span></li>
+    <li>(C6) Start positions: <span class="equation">\( q_k(0)=q_k^{\text{start}} \)</span></li>
+  </ul>
+  <p class="highlight"><strong>Retargeting rule (practical tie-breaker).</strong> While tracking \(j\), switch to \(i\) if \(S_{i,k}(t) \ge S_{j,k}(t)+\delta\). Use a small hysteresis \(\delta\) or a minimal binding time to avoid flip-flops.</p>
 
-  <!-- PAPER -->
-  <section id="paper">
-    <div class="card">
-      <h2>📄 Full paper</h2>
-      <div class="media" style="padding-bottom:120%">
-        <embed src="Reactive_Planning_for_Marine_Debris_Collection_in_Dynamic_Ocean_Environments_Paper.pdf" type="application/pdf" />
-      </div>
-    </div>
-  </section>
+  <h3>Data used</h3>
+  <ul>
+    <li><strong>Currents:</strong> surface current vectors from NetCDF reader at vessel/patch positions.</li>
+    <li><strong>Hotspot values:</strong> proportional to initial cluster size (mass proxy).</li>
+    <li><strong>Parameters:</strong> \(\alpha\in[0,1]\), \(\delta\in[0,0.2]\), capture radius \(\varepsilon\), step \(\Delta t\).</li>
+  </ul>
+</section>
 
-  <!-- COMMENTS -->
-  <section id="comments">
-    <div class="card">
-      <h2>💬 Comments</h2>
-      <p class="muted">Stored locally in your browser. No server.</p>
-      <div style="display:flex;gap:8px">
-        <input id="commentInput" type="text" placeholder="Leave a comment…" style="flex:1;background:#0b1220;color:#e5e7eb;border:1px solid #22345a;border-radius:10px;padding:10px"/>
-        <button onclick="addComment()" style="background:#0d162b;color:#cfe2ff;border:1px solid #23406e;border-radius:10px;padding:10px 14px;cursor:pointer">Submit</button>
-      </div>
-      <div id="commentList" style="margin-top:12px"></div>
-      <div style="margin-top:8px"><button onclick="clearComments()" style="background:transparent;color:#9fb3e3;border:1px dashed #2b364d;border-radius:10px;padding:8px 12px;cursor:pointer">Clear all</button></div>
-    </div>
-  </section>
-</main>
+<section id="logic">
+  <h2>🧠 Greedy Routing Logic</h2>
+  <ol>
+    <li>Compute score for all active hotspots</li>
+    <li>Select the highest-scoring target (respect non-overlap)</li>
+    <li>Move towards the target with drift (update \(q_k\))</li>
+    <li>Collect when within \(\varepsilon\); deactivate hotspot</li>
+    <li>Retarget if a better target emerges (hysteresis \(\delta\))</li>
+  </ol>
+  <div class="slider-container">
+    <label for="alphaRange">Adjust α: <span id="alphaValue">0.50</span></label><br>
+    <input type="range" id="alphaRange" min="0" max="1" step="0.01" value="0.50" oninput="updateAlpha(this.value)">
+  </div>
+</section>
 
-<footer style="max-width:1200px;margin:0 auto;color:#9fb3e3;padding:20px 16px 60px;border-top:1px solid #172036">
-  <p><strong>Paulina Heine</strong> · August 2025 · GitHub Pages</p>
+<section id="comparison">
+  <h2>📊 Alpha Comparison</h2>
+  <img src="alpha_comparison.png" alt="Alpha comparison" style="max-width:100%"/>
+</section>
+
+<section id="video">
+  <h2>🎥 Simulation Video</h2>
+  <div class="video-container">
+    <video controls>
+      <source src="simulation.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</section>
+
+<section id="paper">
+  <h2>📄 Full Paper</h2>
+  <div class="iframe-container">
+    <iframe src="paper.pdf"></iframe>
+  </div>
+</section>
+
+<section id="comments">
+  <h2>💬 Comments</h2>
+  <textarea id="commentInput" placeholder="Leave a comment..." rows="4" style="width:100%;max-width:800px;"></textarea>
+  <br><br>
+  <button onclick="addComment()">Submit</button>
+  <div id="commentList" style="margin-top:20px;"></div>
+</section>
+
+<footer>
+  <p>Paulina Heine · August 2025 · GitHub Pages Presentation</p>
 </footer>
 
 <script>
   // Tabs
-  const tabs = document.querySelectorAll('nav.tabs button');
-  const sections = [...document.querySelectorAll('main section')];
-  tabs.forEach(btn => btn.addEventListener('click', ()=>activateTab(btn.dataset.tab)));
-  function activateTab(id){
-    tabs.forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
-    sections.forEach(s=>s.classList.toggle('active', s.id===id));
-    history.replaceState(null, '', '#'+id);
-    window.scrollTo({top: document.querySelector('nav.tabs').offsetTop, behavior:'smooth'});
+  function showTab(id){
+    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelector(`nav button[onclick*='${id}']`).classList.add('active');
   }
-  window.addEventListener('load', ()=>{ const h = location.hash.replace('#',''); if(h && document.getElementById(h)) activateTab(h); });
 
-  // α slider display
-  function updateAlpha(a){ document.getElementById('alphaValue').textContent = (+a).toFixed(2); }
+  // α slider label
+  function updateAlpha(val){ document.getElementById('alphaValue').textContent = (+val).toFixed(2); }
 
   // Comments (localStorage)
-  const list = document.getElementById('commentList');
   function addComment(){
     const input = document.getElementById('commentInput');
-    const txt = input.value.trim();
-    if(!txt) return;
+    const comment = input.value.trim();
+    if(!comment) return;
+    const list = document.getElementById('commentList');
+    const entry = document.createElement('div');
+    entry.style.padding='10px';
+    entry.style.marginBottom='10px';
+    entry.style.background='#edf2f7';
+    entry.style.borderLeft='4px solid #4299e1';
+    entry.textContent = comment;
+    list.appendChild(entry);
     const comments = JSON.parse(localStorage.getItem('comments')||'[]');
-    comments.push({t: Date.now(), text: txt});
+    comments.push(comment);
     localStorage.setItem('comments', JSON.stringify(comments));
-    input.value='';
-    renderComments();
+    input.value = '';
   }
-  function clearComments(){ localStorage.removeItem('comments'); renderComments(); }
-  function renderComments(){
-    list.innerHTML='';
-    const comments = JSON.parse(localStorage.getItem('comments')||'[]');
-    comments.slice().reverse().forEach(c=>{
-      const div = document.createElement('div');
-      div.style.cssText='background:#0d1831;border-left:4px solid #4ea0ff;padding:10px;border-radius:8px;margin:8px 0;';
-      div.innerHTML=`<strong>${new Date(c.t).toLocaleString()}</strong><br>${escapeHtml(c.text)}`;
-      list.appendChild(div);
+  window.onload = function(){
+    const saved = JSON.parse(localStorage.getItem('comments')||'[]');
+    const list = document.getElementById('commentList');
+    saved.forEach(c=>{
+      const entry = document.createElement('div');
+      entry.style.padding='10px';
+      entry.style.marginBottom='10px';
+      entry.style.background='#edf2f7';
+      entry.style.borderLeft='4px solid #4299e1';
+      entry.textContent=c;
+      list.appendChild(entry);
     });
   }
-  function escapeHtml(s){ return s.replace(/[&<>\"]/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m])); }
-  window.addEventListener('load', renderComments);
 </script>
 
 </body>
