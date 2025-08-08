@@ -3,80 +3,65 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dynamic Routing for Marine Debris · Greedy + Retargeting (Full Site)</title>
-  <meta name="description" content="Your implemented approach for dynamic routing: α‑weighted greedy selection and practical retargeting. Numbered equations, figures, media, and ready‑to‑use code." />
+  <title>Dynamic Routing for Marine Debris · Greedy + Retargeting</title>
+  <meta name="description" content="Clean, copy‑paste site of your implemented method: α‑weighted greedy selection with simple retargeting. Includes data explanation, equations, slider, media, and comments." />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- MathJax with numbering -->
-  <script>
-    window.MathJax = {
-      tex: { tags: 'all', inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
-      chtml: { matchFontHeight: false }
-    };
-  </script>
+  <!-- MathJax for equations (simple numbering) -->
+  <script>window.MathJax={tex:{tags:'all',inlineMath:[["$","$"],["\\(","\\)"]],displayMath:[["$$","$$"],["\\[","\\]"]]},chtml:{matchFontHeight:false}};</script>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-  <!-- Chart.js for one interactive plot -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
   <style>
-    :root{
-      --bg:#0b1220; --panel:#0c152b; --text:#e5e7eb; --muted:#9fb3e3; --line:#1b2a4d;
-      --brand:#60a5fa; --brand2:#06b6d4; --shadow:0 10px 30px rgba(0,0,0,.35);
-    }
+    :root{--bg:#0b1220;--panel:#0c152b;--text:#e5e7eb;--muted:#9fb3e3;--line:#1b2a4d;--brand:#60a5fa}
     *{box-sizing:border-box}
-    body{margin:0;background:radial-gradient(1200px 800px at 80% -10%, rgba(59,130,246,.12), transparent 60%),radial-gradient(1100px 700px at -10% 30%, rgba(6,182,212,.12), transparent 60%),var(--bg);color:var(--text);font-family:Inter,system-ui;line-height:1.55}
+    body{margin:0;background:radial-gradient(1200px 800px at 80% -10%, rgba(96,165,250,.12), transparent 60%),radial-gradient(1000px 700px at -10% 30%, rgba(14,165,233,.12), transparent 60%),var(--bg);color:var(--text);font-family:Inter,system-ui;line-height:1.55}
     a{color:var(--brand)}
-    header.hero{padding:60px 16px 22px;text-align:center}
-    .badge{display:inline-block;padding:.35rem .6rem;border:1px solid #2d3b55;border-radius:999px;color:#c7d2fe;font-weight:600;background:linear-gradient(90deg,rgba(59,130,246,.15),rgba(6,182,212,.15))}
-    .title{font-size:clamp(28px,6vw,48px);margin:16px auto 8px;font-weight:800}
-    .subtitle{max-width:1000px;margin:0 auto;color:var(--muted)}
+    header.hero{padding:56px 16px 18px;text-align:center}
+    .title{font-size:clamp(28px,6vw,48px);margin:0 0 8px;font-weight:800}
+    .subtitle{max-width:980px;margin:0 auto;color:var(--muted)}
 
-    nav.tabs{position:sticky;top:0;z-index:50;backdrop-filter:saturate(160%) blur(8px);background:rgba(10,17,33,.7);border-bottom:1px solid #172036}
+    nav.tabs{position:sticky;top:0;z-index:10;backdrop-filter:saturate(160%) blur(8px);background:rgba(10,17,33,.7);border-bottom:1px solid #172036}
     nav.tabs .wrap{max-width:1200px;margin:auto;display:flex;gap:8px;padding:10px}
     nav.tabs button{flex:1 1 auto;min-width:120px;background:#0d162b;color:#bcd1ff;border:1px solid #1a2540;padding:12px;border-radius:10px;cursor:pointer;font-weight:700}
     nav.tabs button.active{background:linear-gradient(135deg,rgba(59,130,246,.3),rgba(6,182,212,.3));border-color:#23406e}
 
-    main{max-width:1200px;margin:0 auto;padding:24px 16px 90px}
+    main{max-width:1200px;margin:0 auto;padding:22px 16px 80px}
     section{display:none}
     section.active{display:block}
     .grid{display:grid;gap:16px}
-    .grid.cols-3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
     .two-col{display:grid;gap:16px;grid-template-columns:1.15fr .85fr}
     @media (max-width: 920px){.two-col{grid-template-columns:1fr}}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
-    .card h3{margin-top:0}
-    .muted{color:var(--muted)}
-    .equation{background:#0b1429;border:1px dashed #203258;border-radius:12px;padding:10px 12px;margin:10px 0;font-size:1.02rem}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
+    .equation{background:#0b1429;border:1px dashed #203258;border-radius:12px;padding:10px 12px;margin:10px 0}
     .media{position:relative;width:100%;overflow:hidden;border-radius:16px;border:1px solid #213357;background:#0a1326}
     .media::after{content:"";display:block;padding-bottom:56.25%}
     .media>*{position:absolute;inset:0;width:100%;height:100%;border:0}
     pre{background:#0b1429;border:1px solid #203258;border-radius:12px;padding:12px;overflow:auto}
-    code{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+    .muted{color:var(--muted)}
     .tag{display:inline-block;padding:.3rem .6rem;border:1px solid #203258;border-radius:999px;color:#b8c7ee;margin:2px;font-size:12px}
   </style>
 </head>
 <body>
 
 <header class="hero">
-  <div class="badge">Operations Research · Marine Robotics</div>
-  <h1 class="title">Dynamic Routing for Marine Debris Collection</h1>
-  <p class="subtitle">Your implemented method: <strong>α‑weighted greedy</strong> selection with <strong>practical retargeting</strong> under drift. Numbered equations, code you can paste, and media.</p>
+  <h1 class="title">Dynamic Routing for Marine Debris</h1>
+  <p class="subtitle">Your implemented approach: <strong>α‑weighted greedy</strong> selection with <strong>simple retargeting</strong> under ocean drift. Clean, minimal math and practical explanations.</p>
 </header>
 
 <nav class="tabs" aria-label="Sections">
   <div class="wrap">
     <button data-tab="problem" class="active">📍 Problem</button>
-    <button data-tab="model">📐 Model (your implementation)</button>
-    <button data-tab="retarget">🔁 Retargeting</button>
-    <button data-tab="results">📊 Results</button>
-    <button data-tab="code">💻 Code</button>
-    <button data-tab="media">🎥 Media</button>
+    <button data-tab="math">📐 Math</button>
+    <button data-tab="logic">🧠 Logic</button>
+    <button data-tab="comparison">📊 Comparison</button>
+    <button data-tab="video">🎥 Video</button>
+    <button data-tab="paper">📄 Paper</button>
+    <button data-tab="comments">💬 Comments</button>
   </div>
 </nav>
 
@@ -85,171 +70,104 @@
   <section id="problem" class="active">
     <div class="two-col">
       <div class="card">
-        <h2>📍 Problem</h2>
-        <p>Hotspots (plastic patches) drift with surface currents; vessels move with their own propulsion plus drift. The objective is to maximize collected value within a time budget by repeatedly selecting the best next target with an \(\alpha\)-weighted score.</p>
-        <div class="tag">Greedy</div><div class="tag">Reactive</div><div class="tag">Drift‑aware</div><div class="tag">OpenDrift</div>
+        <h2>📍 Problem description</h2>
+        <p>Plastic hotspots drift with surface currents. We control one or more vessels that move with their own speed plus drift. Each hotspot has a position and a value (proportional to mass/size). Goal: maximize total collected value within the simulation horizon.</p>
+        <div class="tag">Greedy</div><div class="tag">Reactive</div><div class="tag">OpenDrift currents</div><div class="tag">No depot</div>
       </div>
       <div class="card">
-        <h3>Illustration</h3>
-        <div class="media"><img src="Bildschirmfoto 2025-08-06 um 12.10.13.png" alt="Greedy trade‑offs visualization" style="object-fit:cover"></div>
+        <h3>Figure</h3>
+        <div class="media"><img src="Bildschirmfoto 2025-08-06 um 12.10.13.png" alt="Greedy trade‑offs" style="object-fit:cover"></div>
+        <p class="muted">Proximity‑only vs value‑only vs a balanced α mix.</p>
       </div>
     </div>
   </section>
 
-  <!-- MODEL: YOUR IMPLEMENTATION -->
-  <section id="model">
+  <!-- MATH -->
+  <section id="math">
     <div class="card">
-      <h2>📐 1. Discrete model (as implemented)</h2>
-      <p>Time steps \(t=0,1,\dots,\mathcal T\) with step size \(\Delta t\). For vessel \(k\) and hotspot \(i\):</p>
-      <div class="equation">\begin{equation}\label{eq:boat}
-        q_k(t{+}1) = q_k(t) + v_k\, u_k(t)\, \Delta t + c\big(q_k(t), t\big)\, \Delta t\,,\qquad \lVert u_k(t)\rVert_2=1.
-      \end{equation}</div>
-      <div class="equation">\begin{equation}\label{eq:patch}
-        p_i(t{+}1) = p_i(t) + c\big(p_i(t), t\big)\, \Delta t\,.
-      \end{equation}</div>
-      <p>Collection if within radius \(\varepsilon\):</p>
-      <div class="equation">\begin{equation}\label{eq:collect}
-        x_{i,k}(t) := \mathbf{1}\{\lVert q_k(t)-p_i(t)\rVert_2 \le \varepsilon\}\;\Rightarrow\; v_i\leftarrow 0,\ i\text{ deactivated.}
-      \end{equation}</div>
-    </div>
-
-    <div class="card">
-      <h2>📏 2. Greedy score (distance–value)</h2>
-      <p>For the active candidate set at time \(t\):</p>
-      <div class="equation">\begin{equation}\label{eq:score}
-        S_{i,k}(t) = \alpha\Big(1 - \tfrac{d_{i,k}(t)}{d_{\max}(t)}\Big) + (1-\alpha)\,\tfrac{v_i}{v_{\max}(t)}\,,\qquad \alpha\in[0,1].
-      \end{equation}</div>
-      <p>Non‑overlap pursuit (one target per vessel and time; each target pursued by at most one vessel):</p>
-      <div class="equation">\begin{equation}\label{eq:nonoverlap}
-        \sum_k z_{i,k}(t) \le 1,\qquad \sum_i z_{i,k}(t) \le 1,\qquad z_{i,k}(t)\in\{0,1\}.
-      \end{equation}</div>
+      <h2>📐 Math (α‑score, motion, retargeting)</h2>
+      <p><strong>Motion (discrete time):</strong></p>
+      <div class="equation">\( q_k(t{+}1) = q_k(t) + v_k u_k(t) \Delta t + c(q_k(t),t) \Delta t \)</div>
+      <div class="equation">\( p_i(t{+}1) = p_i(t) + c(p_i(t),t) \Delta t \)</div>
+      <p><strong>Collection rule:</strong> collected when \(\lVert q_k(t)-p_i(t)\rVert \le \varepsilon\); then value \(v_i \to 0\) and hotspot is removed.</p>
+      <p><strong>Greedy score (normalized):</strong></p>
+      <div class="equation">\( S_i = \alpha\Big(1 - \tfrac{d_i}{d_{\max}}\Big) + (1-\alpha)\Big(\tfrac{v_i}{v_{\max}}\Big) \)</div>
+      <p><strong>Retargeting (simple rule):</strong> while tracking target \(j\), switch to \(i\) if \(S_i \ge S_j + \delta\). Add a minimum binding time to avoid oscillations.</p>
+      <h3>Data explained</h3>
+      <ul>
+        <li><strong>Currents:</strong> surface current vectors from your OpenDrift reader at vessel/patch positions.</li>
+        <li><strong>Values:</strong> proportional to initial patch size (fixed per hotspot in the run).</li>
+        <li><strong>Parameters:</strong> \(\alpha\in[0,1]\) trade‑off; \(\delta\in[0,0.2]\) hysteresis; \(\varepsilon\) collection radius; \(\Delta t\) time step.</li>
+      </ul>
     </div>
   </section>
 
-  <!-- RETARGETING -->
-  <section id="retarget">
+  <!-- LOGIC -->
+  <section id="logic">
     <div class="card">
-      <h2>🔁 Retargeting rule (your code)</h2>
-      <p>While vessel \(k\) tracks target \(j\), allow switching to \(i\) if its score is sufficiently better by a hysteresis \(\delta>0\):</p>
-      <div class="equation">\begin{equation}\label{eq:retarget}
-        S_{i,k}(t) \ge S_{j,k}(t) + \delta \;\Rightarrow\; \text{switch target to } i.
-      \end{equation}</div>
-      <p>Practical guards: minimum binding time, angle/side‑distance filter (only near‑path candidates), and per‑step reevaluation frequency.</p>
-    </div>
-    <div class="card">
-      <h3>Why retargeting improves yield (sketch)</h3>
-      <p>If a near‑path target \(i\) offers \(S_{i,k}(t)\ge S_{j,k}(t)+\delta\) and \(d_{i,k}(t)+d_{i\to j}(t)\approx d_{j,k}(t)\), then collecting \(i\) first increases cumulative value with negligible delay to \(j\). The hysteresis \(\delta\) ensures only clearly beneficial switches occur.</p>
+      <h2>🧠 Greedy logic</h2>
+      <ol>
+        <li>Compute score for all active hotspots</li>
+        <li>Select best; if already tracking another, apply retargeting rule</li>
+        <li>Move towards current target with drift</li>
+        <li>Collect if within radius; remove and repeat</li>
+      </ol>
+      <div class="equation"><em>Tip:</em> Recompute every step for reactive behaviour; or less often for smoother tracks.</div>
+      <h3>α slider (visual only)</h3>
+      <label for="alphaRange">Adjust α: <strong><span id="alphaValue">0.50</span></strong></label>
+      <input id="alphaRange" type="range" min="0" max="1" step="0.01" value="0.5" oninput="updateAlpha(this.value)" style="width:100%"/>
     </div>
   </section>
 
-  <!-- RESULTS (alpha figure + toy chart) -->
-  <section id="results">
+  <!-- COMPARISON -->
+  <section id="comparison">
     <div class="card">
-      <h2>📊 Results snapshot</h2>
-      <div class="grid cols-3">
-        <div class="card" style="grid-column:1/-1">
-          <h3>Alpha comparison figure</h3>
-          <div class="media"><img src="AlphaVgl.png" alt="Alpha comparison" style="object-fit:cover"/></div>
-        </div>
-        <div class="card" style="grid-column:1/-1">
-          <h3>Interactive α toy curve</h3>
-          <input id="alphaRange2" type="range" min="0" max="1" step="0.01" value="0.8" oninput="updateAlpha2(this.value)" style="width:100%"/>
-          <p>α = <strong><span id="alphaValue2">0.80</span></strong></p>
-          <canvas id="alphaChart2" aria-label="toy alpha"></canvas>
-        </div>
+      <h2>📊 Alpha comparison</h2>
+      <div class="media"><img src="AlphaVgl.png" alt="Alpha comparison" style="object-fit:cover"></div>
+    </div>
+  </section>
+
+  <!-- VIDEO -->
+  <section id="video">
+    <div class="card">
+      <h2>🎥 Simulation video</h2>
+      <div class="media">
+        <video controls>
+          <source src="neu.mov" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
       </div>
     </div>
   </section>
 
-  <!-- CODE -->
-  <section id="code">
+  <!-- PAPER -->
+  <section id="paper">
     <div class="card">
-      <h2>💻 Paste‑ready code (matches your implementation)</h2>
-      <p>Drop these functions into your <code>greedy.py</code>/<code>Boat.py</code>. They implement Eq. \eqref{eq:score} and \eqref{eq:retarget}.</p>
-      <pre><code class="language-python"># ---------- greedy_score_and_retarget.py ----------
-import numpy as np
-
-# distance + value score with alpha trade-off (Eq. (\ref{eq:score}))
-def greedy_scores_alpha(q_k, targets_pos, targets_val, alpha=0.8):
-    """q_k: np.array([x,y]);
-    targets_pos: dict[id -> np.array([x,y])];
-    targets_val: dict[id -> float]"""
-    if not targets_pos:
-        return {}
-    dists = {i: float(np.linalg.norm(targets_pos[i] - q_k)) for i in targets_pos}
-    d_max = max(dists.values()) or 1.0
-    v_max = max((targets_val[i] for i in targets_pos), default=1.0) or 1.0
-    scores = {
-        i: float(alpha * (1.0 - dists[i] / d_max) + (1.0 - alpha) * (targets_val[i] / v_max))
-        for i in targets_pos
-    }
-    return scores
-
-# hysteresis-based retargeting (Eq. (\ref{eq:retarget}))
-def select_or_retarget(current_target, scores, delta=0.05):
-    if not scores:
-        return None
-    best = max(scores, key=scores.get)
-    if current_target is None:
-        return best
-    return best if scores[best] >= scores.get(current_target, -1e9) + delta else current_target
-
-# steering towards target with drift (Eq. (\ref{eq:boat}))
-def step_with_drift(q_k, v_k, target_pos, dt, current_at):
-    if target_pos is None:
-        return q_k
-    direction = target_pos - q_k
-    norm = np.linalg.norm(direction) + 1e-12
-    u_k = direction / norm
-    drift = np.array(current_at(q_k[0], q_k[1]))
-    return q_k + v_k * u_k * dt + drift * dt
-
-# collection check (Eq. (\ref{eq:collect}))
-def collected(q_k, p_i, eps):
-    return float(np.linalg.norm(q_k - p_i)) <= float(eps)
-</code></pre>
-
-      <h3>Typical integration pattern</h3>
-      <pre><code class="language-python"># inside your simulation loop
-scores = greedy_scores_alpha(q_k, targets_pos, targets_val, alpha)
-current_target = select_or_retarget(current_target, scores, delta)
-q_k = step_with_drift(q_k, v_k, targets_pos.get(current_target), dt, current_at)
-if current_target is not None and collected(q_k, targets_pos[current_target], eps):
-    # mark target as collected: set value to 0, remove from candidate set, etc.
-    targets_val[current_target] = 0.0
-    targets_pos.pop(current_target, None)
-    current_target = None
-</code></pre>
-
-      <p class="muted">Rename variables to your project’s names if needed (e.g., <code>boat.q</code>, <code>boat.v</code>, <code>current_reader</code>). The logic is identical to your implementation.</p>
+      <h2>📄 Full paper</h2>
+      <div class="media" style="padding-bottom:120%">
+        <embed src="Reactive_Planning_for_Marine_Debris_Collection_in_Dynamic_Ocean_Environments_Paper.pdf" type="application/pdf" />
+      </div>
     </div>
   </section>
 
-  <!-- MEDIA -->
-  <section id="media">
-    <div class="two-col">
-      <div class="card">
-        <h2>🎥 Simulation video</h2>
-        <div class="media">
-          <video controls>
-            <source src="neu.mov" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        </div>
+  <!-- COMMENTS -->
+  <section id="comments">
+    <div class="card">
+      <h2>💬 Comments</h2>
+      <p class="muted">Stored locally in your browser. No server.</p>
+      <div style="display:flex;gap:8px">
+        <input id="commentInput" type="text" placeholder="Leave a comment…" style="flex:1;background:#0b1220;color:#e5e7eb;border:1px solid #22345a;border-radius:10px;padding:10px"/>
+        <button onclick="addComment()" style="background:#0d162b;color:#cfe2ff;border:1px solid #23406e;border-radius:10px;padding:10px 14px;cursor:pointer">Submit</button>
       </div>
-      <div class="card">
-        <h2>📄 Paper & Poster</h2>
-        <div class="media" style="padding-bottom: 120%">
-          <embed src="Reactive_Planning_for_Marine_Debris_Collection_in_Dynamic_Ocean_Environments_Paper.pdf" type="application/pdf" />
-        </div>
-        <p class="muted">Poster:</p>
-        <div class="media">
-          <embed src="poster jyskävahhhh-2.pdf" type="application/pdf" />
-        </div>
-      </div>
+      <div id="commentList" style="margin-top:12px"></div>
+      <div style="margin-top:8px"><button onclick="clearComments()" style="background:transparent;color:#9fb3e3;border:1px dashed #2b364d;border-radius:10px;padding:8px 12px;cursor:pointer">Clear all</button></div>
     </div>
   </section>
 </main>
+
+<footer style="max-width:1200px;margin:0 auto;color:#9fb3e3;padding:20px 16px 60px;border-top:1px solid #172036">
+  <p><strong>Paulina Heine</strong> · August 2025 · GitHub Pages</p>
+</footer>
 
 <script>
   // Tabs
@@ -264,27 +182,34 @@ if current_target is not None and collected(q_k, targets_pos[current_target], ep
   }
   window.addEventListener('load', ()=>{ const h = location.hash.replace('#',''); if(h && document.getElementById(h)) activateTab(h); });
 
-  // Toy alpha plot
-  let chart2;
-  function initAlphaChart2(){
-    const ctx = document.getElementById('alphaChart2');
-    if(!ctx) return;
-    const labels = Array.from({length:21},(_,i)=> (i/20).toFixed(2));
-    const base = labels.map(x=> toyValue(+x));
-    chart2 = new Chart(ctx, { type:'line', data:{labels, datasets:[{label:'toy value', data:base, tension:.35}]}, options:{plugins:{legend:{display:false}}, scales:{x:{title:{display:true,text:'alpha'}}, y:{title:{display:true,text:'value (arb.)'}}}} });
+  // α slider display
+  function updateAlpha(a){ document.getElementById('alphaValue').textContent = (+a).toFixed(2); }
+
+  // Comments (localStorage)
+  const list = document.getElementById('commentList');
+  function addComment(){
+    const input = document.getElementById('commentInput');
+    const txt = input.value.trim();
+    if(!txt) return;
+    const comments = JSON.parse(localStorage.getItem('comments')||'[]');
+    comments.push({t: Date.now(), text: txt});
+    localStorage.setItem('comments', JSON.stringify(comments));
+    input.value='';
+    renderComments();
   }
-  function toyValue(a){
-    const peak = 0.8; const width = 0.45; const base = Math.exp(-Math.pow((a-peak)/width,2));
-    return Math.round((0.7 + 0.35*base + 0.02*Math.sin(10*a))*1000)/1;
+  function clearComments(){ localStorage.removeItem('comments'); renderComments(); }
+  function renderComments(){
+    list.innerHTML='';
+    const comments = JSON.parse(localStorage.getItem('comments')||'[]');
+    comments.slice().reverse().forEach(c=>{
+      const div = document.createElement('div');
+      div.style.cssText='background:#0d1831;border-left:4px solid #4ea0ff;padding:10px;border-radius:8px;margin:8px 0;';
+      div.innerHTML=`<strong>${new Date(c.t).toLocaleString()}</strong><br>${escapeHtml(c.text)}`;
+      list.appendChild(div);
+    });
   }
-  function updateAlpha2(a){
-    const v = (+a).toFixed(2);
-    document.getElementById('alphaValue2').textContent = v;
-    if(!chart2) return;
-    chart2.data.datasets[0].data = chart2.data.labels.map(l=> toyValue(parseFloat(l)));
-    chart2.update('none');
-  }
-  window.addEventListener('load', initAlphaChart2);
+  function escapeHtml(s){ return s.replace(/[&<>\"]/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m])); }
+  window.addEventListener('load', renderComments);
 </script>
 
 </body>
