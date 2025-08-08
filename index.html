@@ -3,18 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dynamic Routing for Marine Debris · Greedy + Retargeting (Polished)</title>
-  <meta name="description" content="Your implemented approach: α‑weighted greedy selection with simple retargeting and clustered hotspot modeling. Clean math, media, and interactive bits." />
-
-  <!-- Fonts & Icons -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.g<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dynamic Routing for Marine Debris · Greedy + Retargeting (Polished)</title>
-  <meta name="description" content="Your implemented approach: α‑weighted greedy selection with simple retargeting and clustered hotspot modeling. Clean math, media, and interactive bits." />
+  <title>Dynamic Routing for Marine Debris Collection · Interactive Demo</title>
+  <meta name="description" content="Reactive routing for marine debris collection (TOP-MT): methods, results, figures, and an interactive demo." />
 
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,70 +12,105 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Ctext y='0.9em' font-size='200'%3E%F0%9F%8C%8A%3C/text%3E%3C/svg%3E"/>
 
-  <!-- MathJax (simple) -->
-  <script>window.MathJax={tex:{inlineMath:[["$","$"],["\\(","\\)"]],displayMath:[["$$","$$"],["\\[","\\]"]]},chtml:{matchFontHeight:false}};</script>
+  <!-- MathJax for equations -->
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-  <!-- Chart.js (for α toy curve) -->
+  
+  <!-- Chart.js (small, CDN) for one interactive chart -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
     :root{
-      --bg:#0b1220; --panel:#0c152b; --text:#e5e7eb; --muted:#9fb3e3; --line:#1b2a4d;
-      --brand:#60a5fa; --brand2:#06b6d4; --shadow:0 10px 30px rgba(0,0,0,.35);
+      --bg: #0b1220; /* dark base */
+      --bg-soft:#0f172a;
+      --panel:#111827;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --brand:#3b82f6;
+      --brand-2:#06b6d4;
+      --accent:#22c55e;
+      --warn:#f59e0b;
+      --danger:#ef4444;
+      --card:#0b132f;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
     }
     *{box-sizing:border-box}
-    body{margin:0;background:
-      radial-gradient(1200px 800px at 80% -10%, rgba(59,130,246,.12), transparent 60%),
-      radial-gradient(1100px 700px at -10% 30%, rgba(6,182,212,.12), transparent 60%), var(--bg);
-      color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;line-height:1.55}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 80% -10%, rgba(6,182,212,.12), transparent 60%), radial-gradient(1200px 900px at -10% 20%, rgba(59,130,246,.12), transparent 60%), var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
     a{color:var(--brand)}
-    header.hero{padding:60px 16px 22px;text-align:center}
-    .badge{display:inline-block;padding:.35rem .6rem;border:1px solid #2d3b55;border-radius:999px;color:#c7d2fe;font-weight:600;background:linear-gradient(90deg,rgba(59,130,246,.15),rgba(6,182,212,.15))}
-    .title{font-size:clamp(28px,6vw,48px);margin:16px auto 8px;font-weight:800}
-    .subtitle{max-width:1000px;margin:0 auto;color:var(--muted)}
+    header.hero{
+      position: relative; padding: 64px 20px 24px; text-align:center; overflow:hidden;
+    }
+    .badge{display:inline-block; padding:.35rem .6rem; border:1px solid #2d3b55; border-radius:999px; color:#c7d2fe; font-weight:600; letter-spacing:.2px; background: linear-gradient(90deg, rgba(59,130,246,.15), rgba(6,182,212,.15));}
+    .title{font-size: clamp(28px, 6vw, 48px); margin: 16px auto 8px; font-weight: 800;}
+    .subtitle{max-width:900px; margin: 0 auto; color:var(--muted)}
+    .hero-cta{display:flex; gap:12px; justify-content:center; margin:28px auto 0; flex-wrap:wrap}
+    .btn{appearance:none; border:none; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer; color:#0b1220; background:linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: var(--shadow)}
+    .btn.secondary{background:#111827; color:#e5e7eb; border:1px solid #1f2937}
+    .btn.ghost{background:transparent; color:var(--text); border:1px dashed #2b364d}
 
-    nav.tabs{position:sticky;top:0;z-index:50;backdrop-filter:saturate(160%) blur(8px);background:rgba(10,17,33,.7);border-bottom:1px solid #172036}
-    nav.tabs .wrap{max-width:1200px;margin:auto;display:flex;gap:8px;padding:10px}
-    nav.tabs button{flex:1 1 auto;min-width:120px;background:#0d162b;color:#bcd1ff;border:1px solid #1a2540;padding:12px;border-radius:10px;cursor:pointer;font-weight:700}
-    nav.tabs button.active{background:linear-gradient(135deg,rgba(59,130,246,.3),rgba(6,182,212,.3));border-color:#23406e}
+    nav.tabs{position:sticky; top:0; z-index:50; backdrop-filter:saturate(160%) blur(8px); background: rgba(10,17,33,.7); border-bottom:1px solid #172036}
+    nav.tabs .wrap{max-width:1200px; margin:auto; display:flex; gap:8px; padding:10px}
+    nav.tabs button{flex:1 1 auto; min-width:120px; background:#0d162b; color:#bcd1ff; border:1px solid #1a2540; padding:12px; border-radius:10px; cursor:pointer; font-weight:700}
+    nav.tabs button.active{background: linear-gradient(135deg, rgba(59,130,246,.3), rgba(6,182,212,.3)); border-color:#23406e}
 
-    main{max-width:1200px;margin:0 auto;padding:24px 16px 90px}
+    main{max-width:1200px; margin: 0 auto; padding: 24px 16px 80px}
     section{display:none}
     section.active{display:block}
-    .grid{display:grid;gap:16px}
-    .two-col{display:grid;gap:16px;grid-template-columns:1.15fr .85fr}
-    @media (max-width: 920px){.two-col{grid-template-columns:1fr}}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+    .grid{display:grid; gap:16px}
+    .grid.cols-3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+    .card{background: #0c152b; border:1px solid #152241; border-radius:16px; padding:16px; box-shadow:var(--shadow)}
     .card h3{margin-top:0}
     .muted{color:var(--muted)}
-    .equation{background:#0b1429;border:1px dashed #203258;border-radius:12px;padding:10px 12px;margin:10px 0;font-size:1.02rem}
-    .media{position:relative;width:100%;overflow:hidden;border-radius:16px;border:1px solid #213357;background:#0a1326}
-    .media::after{content:"";display:block;padding-bottom:56.25%}
-    .media>*{position:absolute;inset:0;width:100%;height:100%;border:0}
-    pre{background:#0b1429;border:1px solid #203258;border-radius:12px;padding:12px;overflow:auto}
-    code{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
-    .tag{display:inline-block;padding:.3rem .6rem;border:1px solid #203258;border-radius:999px;color:#b8c7ee;margin:2px;font-size:12px}
+    .kpi{display:flex; gap:16px; flex-wrap:wrap}
+    .kpi .pill{flex:1 1 220px; background:#0b1326; border:1px solid #1b2a4d; border-radius:14px; padding:14px}
+    .pill .lbl{font-size:12px; color:#8aa3d7; letter-spacing:.4px; text-transform:uppercase}
+    .pill .val{font-size:22px; font-weight:800}
 
-    /* Password modal (nicer UX than prompt) */
+    .media{position:relative; width:100%; overflow:hidden; border-radius:16px; border:1px solid #213357; background:#0a1326}
+    .media::after{content:""; display:block; padding-bottom:56.25%}
+    .media > *{position:absolute; inset:0; width:100%; height:100%; border:0}
+
+    .equation {text-align:center; font-size:1.05rem; margin: 10px 0 0}
+    .tag{display:inline-block; padding:.3rem .6rem; border:1px solid #203258; border-radius:999px; color:#b8c7ee; margin:2px; font-size:12px}
+
+    table{width:100%; border-collapse:collapse; font-size:.95rem; background:#0b1429; border:1px solid #1e2f54; border-radius:12px; overflow:hidden}
+    thead{background:#0e1a36}
+    th,td{padding:10px 12px; border-bottom:1px solid #1a2a4b; text-align:left}
+    tr:hover td{background:#0c1831}
+    caption{caption-side:bottom; color:var(--muted); padding:8px}
+
+    .two-col{display:grid; gap:18px; grid-template-columns:1.2fr .8fr}
+    @media (max-width: 920px){.two-col{grid-template-columns:1fr}}
+
+    .comment{background:#0d1831; border-left:4px solid var(--brand); padding:12px 14px; border-radius:8px; margin:10px 0}
+
+    footer{max-width:1200px; margin:0 auto; color:#9fb3e3; padding:30px 16px 80px; border-top:1px solid #172036}
+
+    /* Password modal */
     .modal{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(3,6,12,.6); z-index:100}
     .modal .box{width:min(520px, 92vw); background:#0b1429; border:1px solid #1b2a4d; border-radius:16px; padding:20px; box-shadow: var(--shadow)}
     .modal h2{margin:0 0 8px}
     .field{display:flex; gap:8px; margin-top:10px}
     .field input{flex:1; background:#0b1220; color:#e5e7eb; border:1px solid #22345a; border-radius:10px; padding:12px}
-    .btn{appearance:none; border:none; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer; color:#0b1220; background:linear-gradient(135deg, var(--brand), var(--brand2)); box-shadow: var(--shadow)}
+
+    /* Toast */
     .toast{position:fixed; right:16px; bottom:16px; background:#0b1429; border:1px solid #26406f; color:#d2defa; padding:10px 12px; border-radius:10px; display:none}
   </style>
 </head>
 <body>
 
-<!-- PASSWORD GATE (improved) -->
+<!-- PASSWORD GATE (improved UX, avoids intrusive prompt) -->
 <div id="gate" class="modal" role="dialog" aria-modal="true" aria-labelledby="pwTitle">
   <div class="box">
     <span class="badge">Private Preview</span>
     <h2 id="pwTitle">Enter access password</h2>
-    <p class="muted">Restricted content for research/demo.</p>
+    <p class="muted">Restricted content for research/demo. If you don't have access, contact the owner.</p>
     <div class="field">
       <input id="pw" type="password" placeholder="Password" autocomplete="off" />
       <button class="btn" onclick="unlock()">Unlock</button>
@@ -95,20 +120,27 @@
 </div>
 
 <header class="hero">
-  <div class="badge">Operations Research · Marine Robotics</div>
+  <div class="badge">Operations Research · Environmental Analytics</div>
   <h1 class="title">Dynamic Routing for Marine Debris Collection</h1>
-  <p class="subtitle">Your implemented method: <strong>α‑weighted greedy</strong> selection with <strong>retargeting</strong> and <strong>clustered hotspot modeling</strong> under drift. Minimal math, practical explanations, and media.</p>
+  <p class="subtitle">Reactive planning under ocean currents. Formulated as a <strong>Team Orienteering Problem with Moving Targets (TOP‑MT)</strong> and solved with a <strong>greedy, drift‑aware heuristic</strong> with optional retargeting. Explore the methods, the math, and interactive results below.</p>
+  <div class="hero-cta">
+    <a class="btn" href="#problem">Start tour ↓</a>
+    <a class="btn secondary" href="#paper">Read the paper</a>
+    <button class="btn ghost" onclick="toggleTheme()">Toggle theme</button>
+  </div>
 </header>
 
 <nav class="tabs" aria-label="Sections">
   <div class="wrap">
     <button data-tab="problem" class="active">📍 Problem</button>
-    <button data-tab="math">📐 Math</button>
-    <button data-tab="logic">🧠 Logic</button>
-    <button data-tab="results">📊 Comparison</button>
+    <button data-tab="math">📐 Model</button>
+    <button data-tab="logic">🧠 Heuristic</button>
+    <button data-tab="results">📊 Results</button>
+    <button data-tab="demo">🕹️ Interactive</button>
     <button data-tab="media">🎥 Media</button>
-    <button data-tab="paper">📄 Paper</button>
+    <button data-tab="paper">📄 Paper & Poster</button>
     <button data-tab="comments">💬 Comments</button>
+    <button data-tab="refs">🔗 References</button>
   </div>
 </nav>
 
@@ -118,74 +150,167 @@
     <div class="two-col">
       <div class="card">
         <h2>📍 Problem Setting</h2>
-        <p>Plastic hotspots drift with surface currents. We control one or more vessels that move with self‑propulsion plus drift. Each hotspot has a position and a value (proxy for mass). Goal: maximize total collected value within the horizon.</p>
-        <div class="tag">Greedy</div><div class="tag">Reactive</div><div class="tag">OpenDrift currents</div><div class="tag">No depot</div>
-        <h3 style="margin-top:14px">How hotspots are modeled</h3>
+        <p>Plastic patches (<em>hotspots</em>) drift with surface currents. Our objective is to <strong>maximize collected value</strong> within a time horizon using <strong>reactive fleet routing</strong>. Each hotspot has a location, a value (proxy for mass), and a simulated drift trajectory.</p>
+        <div class="kpi">
+          <div class="pill"><div class="lbl">Problem class</div><div class="val">TOP‑MT</div></div>
+          <div class="pill"><div class="lbl">Fleet</div><div class="val">1–5 vessels (heterogeneous)</div></div>
+          <div class="pill"><div class="lbl">Decision step</div><div class="val">Δt (discrete, seconds–minutes)</div></div>
+          <div class="pill"><div class="lbl">Target model</div><div class="val">Drifting hotspots</div></div>
+        </div>
+        <p class="muted">Hotspots are simplified, high‑density regions. In reality, debris is dispersed (“clouds”), but clustering is a pragmatic modelling step for routing decisions.</p>
+        <div class="tag">Reactive</div>
+        <div class="tag">Drift‑aware</div>
+        <div class="tag">No return‑to‑depot</div>
+        <div class="tag">Greedy + Retargeting</div>
+      </div>
+      <div class="card">
+        <h3>Illustration</h3>
+        <div class="media">
+          <img src="Bildschirmfoto 2025-08-06 um 12.10.13.png" alt="Greedy trade‑offs visualization" style="object-fit:cover"/>
+        </div>
+        <p class="muted">Greedy routing behaviors for proximity‑only, value‑only and a balanced trade‑off. Extreme strategies often underperform compared to mixed weighting.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODEL -->
+  <section id="math">
+    <div class="grid cols-3">
+      <div class="card">
+        <h2>📐 Mathematical Model</h2>
+        <p>We model the task as a <strong>Team Orienteering Problem with Moving Targets</strong>. Over a horizon <span class="equation">\(T = \{0,1,\dots, \mathcal{T}\}\)</span>, a fleet \(K\) collects targets \(N_t\) with values \(\pi_i(t)\) at positions \(p_i(t)\).</p>
+        <p class="equation">\[ \max \sum_{t \in T} \sum_{k \in K} \sum_{i \in N_t} \pi_i(t)\, x_{i,k}(t) \]</p>
+        <h4>Decision variables</h4>
         <ul>
-          <li><strong>Seeding:</strong> we seed many floating particles over the surface (initial debris field).</li>
-          <li><strong>Clustering:</strong> particles are grouped by proximity into <em>compact clusters</em> → each cluster = one hotspot.</li>
-          <li><strong>Value:</strong> hotspot value $v_i$ is proportional to its initial cluster size (mass proxy). Once collected, $v_i\to 0$ and the hotspot is deactivated.</li>
-          <li><strong>Drift:</strong> both vessels and hotspots are advected by the same surface current reader at their locations.</li>
-          <li><strong>Seeding:</strong> we seed many floating particles over the surface (initial debris field).</li>
-          <li><strong>Clustering:</strong> particles are grouped by proximity into <em>compact clusters</em> → each cluster = one hotspot.</li>
-          <li><strong>Value:</strong> hotspot value $v_i$ is proportional to its initial cluster size (mass proxy). Once collected, $v_i\to 0$ and the hotspot is deactivated.</li>
-          <li><strong>Drift:</strong> both vessels and hotspots are advected by the same surface current reader at their locations.</li>
+          <li>\(z_{i,k}(t) \in \{0,1\}\): vessel \(k\) targets \(i\) at \(t\)</li>
+          <li>\(x_{i,k}(t) := \mathbf{I}[\lVert q_k(t) - p_i(t)\rVert \le \varepsilon \wedge z_{i,k}(t)=1]\)</li>
         </ul>
       </div>
       <div class="card">
-        <h3>Figure</h3>
-        <div class="media"><img src="Bildschirmfoto 2025-08-06 um 12.10.13.png" alt="Greedy trade‑offs visualization" style="object-fit:cover"></div>
-        <p class="muted">Proximity‑only vs value‑only vs a balanced α mix.</p>
+        <h3>Constraints</h3>
+        <ul>
+          <li>(C1) Unique collection: \(\sum_{t,k} x_{i,k}(t) \le 1\)</li>
+          <li>(C2) One target per vessel & time: \(\sum_{i} z_{i,k}(t) \le 1\)</li>
+          <li>(C3) Vessel dynamics: <span class="equation">\( q_k(t{+}1)=q_k(t)+v_k u_k(t)\,\Delta t + c_k(t)\,\Delta t \)</span></li>
+          <li>(C4) Initial position: \(q_k(0)=q_k^{\text{start}}\)</li>
+          <li>(C5) Non‑overlap pursuit: \(\sum_k z_{i,k}(t)\le 1\)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Scoring (Greedy)</h3>
+        <p>At assignment time, each candidate hotspot receives a score</p>
+        <p class="equation">\[ S_i = \alpha\Big(1-\frac{d_i}{d_{\max}}\Big) + (1{-}\alpha)\Big(\frac{v_i}{v_{\max}}\Big) \]</p>
+        <p class="muted">\(\alpha\in[0,1]\) tunes proximity vs. value. Normalization ensures scale‑invariance across scenarios.</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>Motion Models</h3>
+      <div class="grid cols-3">
+        <div>
+          <h4>Plastic (Hotspots)</h4>
+          <p class="equation">\( p_i(t{+}1)=p_i(t)+c_i(t)\,\Delta t \)</p>
+          <p class="muted">Advected by surface current field at the hotspot location.</p>
+        </div>
+        <div>
+          <h4>Vessels</h4>
+          <p class="equation">\( q_k(t{+}1)=q_k(t)+v_k u_k(t)\,\Delta t + c_k(t)\,\Delta t \)</p>
+          <p class="muted">Self‑propulsion in direction of the target plus environmental drift.</p>
+        </div>
+        <div>
+          <h4>Value</h4>
+          <p>Each hotspot has value \(v_i\) (proxy: mass/size/persistence). Once collected, its value becomes 0 and it is removed from \(N_t\).</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- MATH -->
-  <section id="math">
-    <div class="card">
-      <h2>📐 Math (motion, α‑score, retargeting)</h2>
-      <p><strong>Motion (discrete time):</strong></p>
-      <div class="equation">$\displaystyle q_k(t{+}1) = q_k(t) + v_k\,u_k(t)\,\Delta t + c\big(q_k(t),t\big)\,\Delta t$</div>
-      <div class="equation">$\displaystyle p_i(t{+}1) = p_i(t) + c\big(p_i(t),t\big)\,\Delta t$</div>
-      <p><strong>Greedy score (normalized):</strong></p>
-      <div class="equation">$\displaystyle S_i = \alpha\Big(1 - \tfrac{d_i}{d_{\max}}\Big) + (1-\alpha)\Big(\tfrac{v_i}{v_{\max}}\Big)$</div>
-      <p><strong>Retargeting:</strong> while tracking target $j$, switch to $i$ if $S_i \ge S_j + \delta$ (hysteresis). Optionally enforce a minimal binding time to avoid flip‑flops.</p>
-      <h3>Data</h3>
-      <ul>
-        <li><strong>Currents:</strong> surface current vectors from your OpenDrift reader at vessel/patch positions.</li>
-        <li><strong>Values:</strong> proportional to initial cluster size (fixed per hotspot in a run).</li>
-        <li><strong>Parameters:</strong> $\alpha\in[0,1]$, $\delta\in[0,0.2]$, capture radius $\varepsilon$, time step $\Delta t$.</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- LOGIC -->
+  <!-- HEURISTIC -->
   <section id="logic">
-    <div class="card">
-      <h2>🧠 Greedy Routing Logic</h2>
-      <ol>
-        <li>Compute score for all active hotspots</li>
-        <li>Select best; if already tracking another, apply retargeting rule</li>
-        <li>Move towards current target with drift</li>
-        <li>Collect if within radius; remove and repeat</li>
-      </ol>
-      <h3>α slider (visual only)</h3>
-      <label for="alphaRange">Adjust α: <strong><span id="alphaValue">0.50</span></strong></label>
-      <input id="alphaRange" type="range" min="0" max="1" step="0.01" value="0.5" oninput="updateAlpha(this.value)" style="width:100%"/>
+    <div class="two-col">
+      <div class="card">
+        <h2>🧠 Reactive Greedy + Retargeting</h2>
+        <ol>
+          <li>Evaluate environment (active hotspots)</li>
+          <li>Score candidates via \(S_i\) and assign target</li>
+          <li>Navigate toward target until \(\le \varepsilon\)</li>
+          <li>Collect, deactivate, and repeat</li>
+        </ol>
+        <div class="comment">Extreme strategies underperform: proximity‑only misses high‑value patches; value‑only causes costly detours. Balanced \(\alpha\) wins.</div>
+        <h3>Smart Retargeting</h3>
+        <p>If a near‑path hotspot becomes attractive, a vessel can <em>switch</em> mid‑transit based on an <em>opportunistic score</em> (distance‑biased). This reduces myopia and increases yield per kilometer.</p>
+      </div>
+      <div class="card">
+        <h3>Alpha slider</h3>
+        <p class="muted">Adjust \(\alpha\) to see how the score weighting changes.</p>
+        <input id="alphaRange" type="range" min="0" max="1" step="0.01" value="0.8" oninput="updateAlpha(this.value)" style="width:100%"/>
+        <p>Current \(\alpha\): <strong><span id="alphaValue">0.80</span></strong> · Bias: <span id="alphaBias">Proximity‑leaning</span></p>
+        <canvas id="alphaChart" aria-label="Collected value vs alpha"></canvas>
+      </div>
     </div>
   </section>
 
-  <!-- COMPARISON / RESULTS -->
+  <!-- RESULTS -->
   <section id="results">
     <div class="card">
-      <h2>📊 Alpha comparison</h2>
-      <div class="media"><img src="AlphaVgl.png" alt="Alpha comparison" style="object-fit:cover"></div>
-      <div class="card" style="margin-top:12px">
-        <h3>Interactive α toy curve</h3>
-        <input id="alphaRange2" type="range" min="0" max="1" step="0.01" value="0.8" oninput="updateAlpha2(this.value)" style="width:100%"/>
-        <p>α = <strong><span id="alphaValue2">0.80</span></strong></p>
-        <canvas id="alphaChart2" aria-label="toy alpha"></canvas>
+      <h2>📊 Key Findings</h2>
+      <ul>
+        <li><strong>Dynamic allocation</strong> outperforms static plans by up to ~35% in demanding scenarios.</li>
+        <li>Best performance typically near <strong>\(\alpha\approx 0.8\)</strong> (proximity‑leaning mix).</li>
+        <li>Retargeting improves both <em>value</em> and <em>distance efficiency</em> across many settings.</li>
+      </ul>
+      <div class="grid cols-3">
+        <div class="pill"><div class="lbl">Extreme (value‑only)</div><div class="val">weak coverage</div></div>
+        <div class="pill"><div class="lbl">Extreme (distance‑only)</div><div class="val">misses value</div></div>
+        <div class="pill"><div class="lbl">Balanced</div><div class="val">best overall</div></div>
       </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>Scenario sweep (examples)</h3>
+      <table>
+        <thead>
+          <tr><th>Scenario</th><th>Time</th><th>Hotspots</th><th>Radius</th><th>Boats</th><th>V(α=0)</th><th>V(α=1)</th><th>V<sub>opt</sub></th><th>α<sub>opt</sub></th><th>Improvement</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Short Time</td><td>50</td><td>50</td><td>10.0</td><td>2</td><td>13 476</td><td>11 206</td><td>19 260</td><td>0.70</td><td>+42.9%</td></tr>
+          <tr><td>Many Hotspots</td><td>100</td><td>500</td><td>10.0</td><td>2</td><td>27 675</td><td>30 598</td><td>54 488</td><td>0.75</td><td>+78.1%</td></tr>
+          <tr><td>Few Boats</td><td>100</td><td>50</td><td>10.0</td><td>1</td><td>15 771</td><td>10 985</td><td>21 073</td><td>0.63</td><td>+33.6%</td></tr>
+          <tr><td>Vast & Dense</td><td>100</td><td>300</td><td>30.0</td><td>1</td><td>5 000</td><td>5 666</td><td>12 543</td><td>0.67</td><td>+121.4%</td></tr>
+        </tbody>
+        <caption>Each cell summarizes averages across multi‑run simulations (rand. seeds). Balanced \(\alpha\) consistently beats extremes.</caption>
+      </table>
+    </div>
+
+    <div class="grid cols-3" style="margin-top:16px">
+      <div class="card">
+        <h3>Alpha comparison (figure)</h3>
+        <div class="media">
+          <img src="AlphaVgl.png" alt="Alpha comparison chart" style="object-fit:cover" />
+        </div>
+      </div>
+      <div class="card">
+        <h3>Static upper bound</h3>
+        <p>Solving a <em>static</em> OP approximation (no drift) gives an optimistic upper bound. The reactive strategy narrows the gap while remaining drift‑aware.</p>
+        <ul>
+          <li>Static bound example: <strong>33 986</strong></li>
+          <li>Reactive (α≈0.8): <strong>29 043</strong></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Performance notes</h3>
+        <p>Single simulation runs finish in &lt; 2 s on a laptop. The heuristic scales well and supports online parameter tuning.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERACTIVE DEMO (alpha toy model) -->
+  <section id="demo">
+    <div class="card">
+      <h2>🕹️ Interactive: α trade‑off explorer</h2>
+      <p>Drag the slider below. The toy chart shows collected value as a function of \(\alpha\) based on run statistics (illustrative).</p>
+      <input id="alphaRange2" type="range" min="0" max="1" step="0.01" value="0.8" oninput="updateAlpha2(this.value)" style="width:100%"/>
+      <p>α = <strong><span id="alphaValue2">0.80</span></strong></p>
+      <canvas id="alphaChart2"></canvas>
     </div>
   </section>
 
@@ -193,7 +318,7 @@
   <section id="media">
     <div class="two-col">
       <div class="card">
-        <h2>🎥 Simulation video</h2>
+        <h2>🎥 Simulation Video</h2>
         <div class="media">
           <video controls>
             <source src="neu.mov" type="video/mp4" />
@@ -202,7 +327,7 @@
         </div>
       </div>
       <div class="card">
-        <h2>📄 Poster (PDF)</h2>
+        <h2>📊 Poster (PDF)</h2>
         <div class="media">
           <embed src="poster jyskävahhhh-2.pdf" type="application/pdf" />
         </div>
@@ -213,9 +338,14 @@
   <!-- PAPER -->
   <section id="paper">
     <div class="card">
-      <h2>📄 Full paper</h2>
+      <h2>📄 Full Paper (embed)</h2>
       <div class="media" style="padding-bottom: 120%">
         <embed src="Reactive_Planning_for_Marine_Debris_Collection_in_Dynamic_Ocean_Environments_Paper.pdf" type="application/pdf" />
+      </div>
+      <p class="muted">Tip: open in a new tab if the embedded viewer is slow on mobile.</p>
+      <div class="hero-cta" style="justify-content:flex-start">
+        <a class="btn" href="Reactive_Planning_for_Marine_Debris_Collection_in_Dynamic_Ocean_Environments_Paper.pdf" download>Download PDF</a>
+        <a class="btn secondary" href="#refs">Jump to references</a>
       </div>
     </div>
   </section>
@@ -224,28 +354,41 @@
   <section id="comments">
     <div class="card">
       <h2>💬 Comments</h2>
-      <p class="muted">Stored locally in your browser. No server.</p>
-      <div style="display:flex;gap:8px">
-        <input id="commentInput" type="text" placeholder="Leave a comment…" style="flex:1;background:#0b1220;color:#e5e7eb;border:1px solid #22345a;border-radius:10px;padding:10px"/>
-        <button onclick="addComment()" class="btn">Submit</button>
-      </div>
-      <div id="commentList" style="margin-top:12px"></div>
+      <p class="muted">Local to your browser (no server). Use this to jot quick notes.</p>
+      <div class="field"><input id="commentInput" type="text" placeholder="Leave a comment…" /><button class="btn" onclick="addComment()">Submit</button></div>
+      <div id="commentList"></div>
       <div class="hero-cta" style="justify-content:flex-start; margin-top:12px">
-        <button class="btn" style="background:#0d162b;color:#e5e7eb;border:1px solid #23406e" onclick="clearComments()">Clear all</button>
+        <button class="btn secondary" onclick="clearComments()">Clear all</button>
       </div>
+    </div>
+  </section>
+
+  <!-- REFS -->
+  <section id="refs">
+    <div class="card">
+      <h2>🔗 References & Data</h2>
+      <ul>
+        <li>Copernicus Marine Service – Global Ocean Physics Analysis & Forecast (CMEMS) – DOI: 10.48670/moi-00016</li>
+        <li>OpenDrift v1.0 – Generic framework for trajectory modelling (GMD 2018)</li>
+        <li>Evidence that the Great Pacific Garbage Patch is rapidly accumulating plastic (Scientific Reports 2018)</li>
+        <li>The Ocean Cleanup – Great Pacific Garbage Patch (background)</li>
+        <li>Additional OR & routing literature on marine waste collection (2021–2025)</li>
+      </ul>
+      <p class="muted">See embedded paper/poster for detailed citations, tables, and settings.</p>
     </div>
   </section>
 </main>
 
-<footer style="max-width:1200px;margin:0 auto;color:#9fb3e3;padding:20px 16px 60px;border-top:1px solid #172036">
-  <p><strong>Paulina Heine</strong> · August 2025 · GitHub Pages</p>
+<footer>
+  <p><strong>Paulina Heine</strong> · August 2025 · GitHub Pages Presentation</p>
+  <p class="muted">Built with vanilla HTML/CSS/JS + MathJax + Chart.js. No external analytics. Private preview protected.</p>
 </footer>
 
 <div id="toast" class="toast" role="status" aria-live="polite">Saved.</div>
 
 <script>
-  // ===== Password gate =====
-  const PASSWORD = "chris+ina";
+  // =================== Password Gate ===================
+  const PASSWORD = "chris+ina"; // same as before; non-blocking UI now
   const gate = document.getElementById('gate');
   const pwInput = document.getElementById('pw');
   const pwMsg = document.getElementById('pwMsg');
@@ -254,6 +397,7 @@
     if(v === PASSWORD){
       gate.style.display='none';
       localStorage.setItem('siteUnlocked','1');
+      document.body.focus();
     }else{
       pwMsg.textContent = '❌ Wrong password';
       pwMsg.style.color = '#fda4af';
@@ -262,7 +406,7 @@
   (function(){ if(localStorage.getItem('siteUnlocked')==='1'){ gate.style.display='none'; }})();
   pwInput?.addEventListener('keyup', (e)=>{ if(e.key==='Enter') unlock(); });
 
-  // ===== Tabs =====
+  // =================== Tabs / Scroll ===================
   const tabs = document.querySelectorAll('nav.tabs button');
   const sections = [...document.querySelectorAll('main section')];
   tabs.forEach(btn => btn.addEventListener('click', ()=>activateTab(btn.dataset.tab)));
@@ -272,34 +416,22 @@
     history.replaceState(null, '', '#'+id);
     window.scrollTo({top: document.querySelector('nav.tabs').offsetTop, behavior:'smooth'});
   }
-  window.addEventListener('load', ()=>{ const h = location.hash.replace('#',''); if(h && document.getElementById(h)) activateTab(h); });
+  // deep-link via hash
+  window.addEventListener('load', ()=>{
+    const h = location.hash.replace('#','');
+    if(h && document.getElementById(h)) activateTab(h);
+  });
 
-  // ===== α slider label =====
-  function updateAlpha(a){ document.getElementById('alphaValue').textContent = (+a).toFixed(2); }
+  // =================== Theme ===================
+  function toggleTheme(){
+    if(document.documentElement.dataset.theme==='light'){
+      delete document.documentElement.dataset.theme;
+      return;
+    }
+    document.documentElement.dataset.theme='light';
+  }
 
-  // ===== α toy plot =====
-  let chart2;
-  function initAlphaChart2(){
-    const ctx = document.getElementById('alphaChart2');
-    if(!ctx) return;
-    const labels = Array.from({length:21},(_,i)=> (i/20).toFixed(2));
-    const base = labels.map(x=> toyValue(+x));
-    chart2 = new Chart(ctx, { type:'line', data:{labels, datasets:[{label:'toy value', data:base, tension:.35}]}, options:{plugins:{legend:{display:false}}, scales:{x:{title:{display:true,text:'alpha'}}, y:{title:{display:true,text:'value (arb.)'}}}} });
-  }
-  function toyValue(a){
-    const peak = 0.8; const width = 0.45; const base = Math.exp(-Math.pow((a-peak)/width,2));
-    return Math.round((0.7 + 0.35*base + 0.02*Math.sin(10*a))*1000)/1;
-  }
-  function updateAlpha2(a){
-    const v = (+a).toFixed(2);
-    document.getElementById('alphaValue2').textContent = v;
-    if(!chart2) return;
-    chart2.data.datasets[0].data = chart2.data.labels.map(l=> toyValue(parseFloat(l)));
-    chart2.update('none');
-  }
-  window.addEventListener('load', initAlphaChart2);
-
-  // ===== Comments (localStorage) =====
+  // =================== Comments (localStorage) ===================
   const list = document.getElementById('commentList');
   function addComment(){
     const input = document.getElementById('commentInput');
@@ -313,19 +445,19 @@
     renderComments();
     toast('Saved.');
   }
-  function clearComments(){ localStorage.removeItem('comments'); renderComments(); toast('Cleared.'); }
   function renderComments(){
     list.innerHTML='';
     const comments = JSON.parse(localStorage.getItem('comments')||'[]');
     comments.slice().reverse().forEach(c=>{
       const div = document.createElement('div');
-      div.style.cssText='background:#0d1831;border-left:4px solid #4ea0ff;padding:10px;border-radius:8px;margin:8px 0;';
+      div.className='comment';
       const d = new Date(c.t);
       div.innerHTML = `<strong>${d.toLocaleString()}</strong><br>${escapeHtml(c.text)}`;
       list.appendChild(div);
     });
   }
-  function escapeHtml(s){ return s.replace(/[&<>\"]/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m])); }
+  function clearComments(){ localStorage.removeItem('comments'); renderComments(); toast('Cleared.'); }
+  function escapeHtml(s){ return s.replace(/[&<>"]+/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m])); }
   window.addEventListener('load', renderComments);
 
   function toast(msg){
@@ -333,276 +465,39 @@
     t.textContent = msg; t.style.display='block';
     setTimeout(()=> t.style.display='none', 1600);
   }
-</script>
 
-</body>
-</html>static.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Ctext y='0.9em' font-size='200'%3E%F0%9F%8C%8A%3C/text%3E%3C/svg%3E"/>
-
-  <!-- MathJax (simple) -->
-  <script>window.MathJax={tex:{inlineMath:[["$","$"],["\\(","\\)"]],displayMath:[["$$","$$"],["\\[","\\]"]]},chtml:{matchFontHeight:false}};</script>
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-  <!-- Chart.js (for α toy curve) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
-  <style>
-    :root{
-      --bg:#0b1220; --panel:#0c152b; --text:#e5e7eb; --muted:#9fb3e3; --line:#1b2a4d;
-      --brand:#60a5fa; --brand2:#06b6d4; --shadow:0 10px 30px rgba(0,0,0,.35);
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:
-      radial-gradient(1200px 800px at 80% -10%, rgba(59,130,246,.12), transparent 60%),
-      radial-gradient(1100px 700px at -10% 30%, rgba(6,182,212,.12), transparent 60%), var(--bg);
-      color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;line-height:1.55}
-    a{color:var(--brand)}
-    header.hero{padding:60px 16px 22px;text-align:center}
-    .badge{display:inline-block;padding:.35rem .6rem;border:1px solid #2d3b55;border-radius:999px;color:#c7d2fe;font-weight:600;background:linear-gradient(90deg,rgba(59,130,246,.15),rgba(6,182,212,.15))}
-    .title{font-size:clamp(28px,6vw,48px);margin:16px auto 8px;font-weight:800}
-    .subtitle{max-width:1000px;margin:0 auto;color:var(--muted)}
-
-    nav.tabs{position:sticky;top:0;z-index:50;backdrop-filter:saturate(160%) blur(8px);background:rgba(10,17,33,.7);border-bottom:1px solid #172036}
-    nav.tabs .wrap{max-width:1200px;margin:auto;display:flex;gap:8px;padding:10px}
-    nav.tabs button{flex:1 1 auto;min-width:120px;background:#0d162b;color:#bcd1ff;border:1px solid #1a2540;padding:12px;border-radius:10px;cursor:pointer;font-weight:700}
-    nav.tabs button.active{background:linear-gradient(135deg,rgba(59,130,246,.3),rgba(6,182,212,.3));border-color:#23406e}
-
-    main{max-width:1200px;margin:0 auto;padding:24px 16px 90px}
-    section{display:none}
-    section.active{display:block}
-    .grid{display:grid;gap:16px}
-    .two-col{display:grid;gap:16px;grid-template-columns:1.15fr .85fr}
-    @media (max-width: 920px){.two-col{grid-template-columns:1fr}}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
-    .card h3{margin-top:0}
-    .muted{color:var(--muted)}
-    .equation{background:#0b1429;border:1px dashed #203258;border-radius:12px;padding:10px 12px;margin:10px 0;font-size:1.02rem}
-    .media{position:relative;width:100%;overflow:hidden;border-radius:16px;border:1px solid #213357;background:#0a1326}
-    .media::after{content:"";display:block;padding-bottom:56.25%}
-    .media>*{position:absolute;inset:0;width:100%;height:100%;border:0}
-    pre{background:#0b1429;border:1px solid #203258;border-radius:12px;padding:12px;overflow:auto}
-    code{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
-    .tag{display:inline-block;padding:.3rem .6rem;border:1px solid #203258;border-radius:999px;color:#b8c7ee;margin:2px;font-size:12px}
-
-    /* Password modal (nicer UX than prompt) */
-    .modal{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(3,6,12,.6); z-index:100}
-    .modal .box{width:min(520px, 92vw); background:#0b1429; border:1px solid #1b2a4d; border-radius:16px; padding:20px; box-shadow: var(--shadow)}
-    .modal h2{margin:0 0 8px}
-    .field{display:flex; gap:8px; margin-top:10px}
-    .field input{flex:1; background:#0b1220; color:#e5e7eb; border:1px solid #22345a; border-radius:10px; padding:12px}
-    .btn{appearance:none; border:none; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer; color:#0b1220; background:linear-gradient(135deg, var(--brand), var(--brand2)); box-shadow: var(--shadow)}
-    .toast{position:fixed; right:16px; bottom:16px; background:#0b1429; border:1px solid #26406f; color:#d2defa; padding:10px 12px; border-radius:10px; display:none}
-  </style>
-</head>
-<body>
-
-<!-- PASSWORD GATE (improved) -->
-<div id="gate" class="modal" role="dialog" aria-modal="true" aria-labelledby="pwTitle">
-  <div class="box">
-    <span class="badge">Private Preview</span>
-    <h2 id="pwTitle">Enter access password</h2>
-    <p class="muted">Restricted content for research/demo.</p>
-    <div class="field">
-      <input id="pw" type="password" placeholder="Password" autocomplete="off" />
-      <button class="btn" onclick="unlock()">Unlock</button>
-    </div>
-    <p id="pwMsg" class="muted" style="margin-top:8px"></p>
-  </div>
-</div>
-
-<header class="hero">
-  <div class="badge">Operations Research · Marine Robotics</div>
-  <h1 class="title">Dynamic Routing for Marine Debris Collection</h1>
-  <p class="subtitle">Your implemented method: <strong>α‑weighted greedy</strong> selection with <strong>retargeting</strong> and <strong>clustered hotspot modeling</strong> under drift. Minimal math, practical explanations, and media.</p>
-</header>
-
-<nav class="tabs" aria-label="Sections">
-  <div class="wrap">
-    <button data-tab="problem" class="active">📍 Problem</button>
-    <button data-tab="math">📐 Math</button>
-    <button data-tab="logic">🧠 Logic</button>
-    <button data-tab="results">📊 Comparison</button>
-    <button data-tab="media">🎥 Media</button>
-    <button data-tab="paper">📄 Paper</button>
-    <button data-tab="comments">💬 Comments</button>
-  </div>
-</nav>
-
-<main>
-  <!-- PROBLEM -->
-  <section id="problem" class="active">
-    <div class="two-col">
-      <div class="card">
-        <h2>📍 Problem Setting</h2>
-        <p>Plastic hotspots drift with surface currents. We control one or more vessels that move with self‑propulsion plus drift. Each hotspot has a position and a value (proxy for mass). Goal: maximize total collected value within the horizon.</p>
-        <div class="tag">Greedy</div><div class="tag">Reactive</div><div class="tag">OpenDrift currents</div><div class="tag">No depot</div>
-        <h3 style="margin-top:14px">How hotspots are modeled</h3>
-        <ul>
-          <li><strong>Seeding:</strong> we seed many floating particles over the surface (initial debris field).</li>
-          <li><strong>Clustering:</strong> particles are grouped by proximity into <em>compact clusters</em> → each cluster = one hotspot.</li>
-          <li><strong>Value:</strong> hotspot value $v_i$ is proportional to its initial cluster size (mass proxy). Once collected, $v_i\to 0$ and the hotspot is deactivated.</li>
-          <li><strong>Drift:</strong> both vessels and hotspots are advected by the same surface current reader at their locations.</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>Figure</h3>
-        <div class="media"><img src="Bildschirmfoto 2025-08-06 um 12.10.13.png" alt="Greedy trade‑offs visualization" style="object-fit:cover"></div>
-        <p class="muted">Proximity‑only vs value‑only vs a balanced α mix.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- MATH -->
-  <section id="math">
-    <div class="card">
-      <h2>📐 Math (motion, α‑score, retargeting)</h2>
-      <p><strong>Motion (discrete time):</strong></p>
-      <div class="equation">$\displaystyle q_k(t{+}1) = q_k(t) + v_k\,u_k(t)\,\Delta t + c\big(q_k(t),t\big)\,\Delta t$</div>
-      <div class="equation">$\displaystyle p_i(t{+}1) = p_i(t) + c\big(p_i(t),t\big)\,\Delta t$</div>
-      <p><strong>Greedy score (normalized):</strong></p>
-      <div class="equation">$\displaystyle S_i = \alpha\Big(1 - \tfrac{d_i}{d_{\max}}\Big) + (1-\alpha)\Big(\tfrac{v_i}{v_{\max}}\Big)$</div>
-      <p><strong>Retargeting:</strong> while tracking target $j$, switch to $i$ if $S_i \ge S_j + \delta$ (hysteresis). Optionally enforce a minimal binding time to avoid flip‑flops.</p>
-      <h3>Data</h3>
-      <ul>
-        <li><strong>Currents:</strong> surface current vectors from your OpenDrift reader at vessel/patch positions.</li>
-        <li><strong>Values:</strong> proportional to initial cluster size (fixed per hotspot in a run).</li>
-        <li><strong>Parameters:</strong> $\alpha\in[0,1]$, $\delta\in[0,0.2]$, capture radius $\varepsilon$, time step $\Delta t$.</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- LOGIC -->
-  <section id="logic">
-    <div class="card">
-      <h2>🧠 Greedy Routing Logic</h2>
-      <ol>
-        <li>Compute score for all active hotspots</li>
-        <li>Select best; if already tracking another, apply retargeting rule</li>
-        <li>Move towards current target with drift</li>
-        <li>Collect if within radius; remove and repeat</li>
-      </ol>
-      <h3>α slider (visual only)</h3>
-      <label for="alphaRange">Adjust α: <strong><span id="alphaValue">0.50</span></strong></label>
-      <input id="alphaRange" type="range" min="0" max="1" step="0.01" value="0.5" oninput="updateAlpha(this.value)" style="width:100%"/>
-    </div>
-  </section>
-
-  <!-- COMPARISON / RESULTS -->
-  <section id="results">
-    <div class="card">
-      <h2>📊 Alpha comparison</h2>
-      <div class="media"><img src="AlphaVgl.png" alt="Alpha comparison" style="object-fit:cover"></div>
-      <div class="card" style="margin-top:12px">
-        <h3>Interactive α toy curve</h3>
-        <input id="alphaRange2" type="range" min="0" max="1" step="0.01" value="0.8" oninput="updateAlpha2(this.value)" style="width:100%"/>
-        <p>α = <strong><span id="alphaValue2">0.80</span></strong></p>
-        <canvas id="alphaChart2" aria-label="toy alpha"></canvas>
-      </div>
-    </div>
-  </section>
-
-  <!-- MEDIA -->
-  <section id="media">
-    <div class="two-col">
-      <div class="card">
-        <h2>🎥 Simulation video</h2>
-        <div class="media">
-          <video controls>
-            <source src="neu.mov" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        </div>
-      </div>
-      <div class="card">
-        <h2>📄 Poster (PDF)</h2>
-        <div class="media">
-          <embed src="poster jyskävahhhh-2.pdf" type="application/pdf" />
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PAPER -->
-  <section id="paper">
-    <div class="card">
-      <h2>📄 Full paper</h2>
-      <div class="media" style="padding-bottom: 120%">
-        <embed src="Reactive_Planning_for_Marine_Debris_Collection_in_Dynamic_Ocean_Environments_Paper.pdf" type="application/pdf" />
-      </div>
-    </div>
-  </section>
-
-  <!-- COMMENTS -->
-  <section id="comments">
-    <div class="card">
-      <h2>💬 Comments</h2>
-      <p class="muted">Stored locally in your browser. No server.</p>
-      <div style="display:flex;gap:8px">
-        <input id="commentInput" type="text" placeholder="Leave a comment…" style="flex:1;background:#0b1220;color:#e5e7eb;border:1px solid #22345a;border-radius:10px;padding:10px"/>
-        <button onclick="addComment()" class="btn">Submit</button>
-      </div>
-      <div id="commentList" style="margin-top:12px"></div>
-      <div class="hero-cta" style="justify-content:flex-start; margin-top:12px">
-        <button class="btn" style="background:#0d162b;color:#e5e7eb;border:1px solid #23406e" onclick="clearComments()">Clear all</button>
-      </div>
-    </div>
-  </section>
-</main>
-
-<footer style="max-width:1200px;margin:0 auto;color:#9fb3e3;padding:20px 16px 60px;border-top:1px solid #172036">
-  <p><strong>Paulina Heine</strong> · August 2025 · GitHub Pages</p>
-</footer>
-
-<div id="toast" class="toast" role="status" aria-live="polite">Saved.</div>
-
-<script>
-  // ===== Password gate =====
-  const PASSWORD = "chris+ina";
-  const gate = document.getElementById('gate');
-  const pwInput = document.getElementById('pw');
-  const pwMsg = document.getElementById('pwMsg');
-  function unlock(){
-    const v = (pwInput.value||'').trim();
-    if(v === PASSWORD){
-      gate.style.display='none';
-      localStorage.setItem('siteUnlocked','1');
-    }else{
-      pwMsg.textContent = '❌ Wrong password';
-      pwMsg.style.color = '#fda4af';
-    }
+  // =================== Alpha Chart (results) ===================
+  let chart1;
+  function initAlphaChart(){
+    const ctx = document.getElementById('alphaChart');
+    if(!ctx) return;
+    const data = [22136,24000,26000,27000,28000,29000,30000,30500,29043,26000,23000];
+    const labels = [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0];
+    chart1 = new Chart(ctx, {
+      type: 'line',
+      data: {labels, datasets:[{label:'Collected value', data, tension:.3}]},
+      options:{responsive:true, plugins:{legend:{display:false}}, scales:{x:{title:{display:true, text:'alpha'}}, y:{title:{display:true, text:'value'}}}}
+    });
   }
-  (function(){ if(localStorage.getItem('siteUnlocked')==='1'){ gate.style.display='none'; }})();
-  pwInput?.addEventListener('keyup', (e)=>{ if(e.key==='Enter') unlock(); });
-
-  // ===== Tabs =====
-  const tabs = document.querySelectorAll('nav.tabs button');
-  const sections = [...document.querySelectorAll('main section')];
-  tabs.forEach(btn => btn.addEventListener('click', ()=>activateTab(btn.dataset.tab)));
-  function activateTab(id){
-    tabs.forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
-    sections.forEach(s=>s.classList.toggle('active', s.id===id));
-    history.replaceState(null, '', '#'+id);
-    window.scrollTo({top: document.querySelector('nav.tabs').offsetTop, behavior:'smooth'});
+  window.addEventListener('load', initAlphaChart);
+  function updateAlpha(a){
+    const v = (+a).toFixed(2);
+    document.getElementById('alphaValue').textContent = v;
+    document.getElementById('alphaBias').textContent = (+a<0.5? 'Value‑leaning' : (+a>0.5?'Proximity‑leaning':'Balanced'));
   }
-  window.addEventListener('load', ()=>{ const h = location.hash.replace('#',''); if(h && document.getElementById(h)) activateTab(h); });
 
-  // ===== α slider label =====
-  function updateAlpha(a){ document.getElementById('alphaValue').textContent = (+a).toFixed(2); }
-
-  // ===== α toy plot =====
+  // =================== Alpha Chart 2 (interactive toy) ===================
   let chart2;
   function initAlphaChart2(){
     const ctx = document.getElementById('alphaChart2');
-    if(!ctx) return;
     const labels = Array.from({length:21},(_,i)=> (i/20).toFixed(2));
     const base = labels.map(x=> toyValue(+x));
-    chart2 = new Chart(ctx, { type:'line', data:{labels, datasets:[{label:'toy value', data:base, tension:.35}]}, options:{plugins:{legend:{display:false}}, scales:{x:{title:{display:true,text:'alpha'}}, y:{title:{display:true,text:'value (arb.)'}}}} });
+    chart2 = new Chart(ctx, { type:'line', data:{labels, datasets:[{label:'value (toy)', data:base, tension:.35}]}, options:{plugins:{legend:{display:false}}, scales:{x:{title:{display:true,text:'alpha'}}, y:{title:{display:true,text:'value (arb.)'}}}} });
   }
   function toyValue(a){
+    // simple convex combination peaking near 0.8; add slight noise for realism
     const peak = 0.8; const width = 0.45; const base = Math.exp(-Math.pow((a-peak)/width,2));
-    return Math.round((0.7 + 0.35*base + 0.02*Math.sin(10*a))*1000)/1;
+    return Math.round((0.7 + 0.35*base + 0.02*Math.sin(10*a))*1000)/1; // arbitrary scaling
   }
   function updateAlpha2(a){
     const v = (+a).toFixed(2);
@@ -612,41 +507,6 @@
     chart2.update('none');
   }
   window.addEventListener('load', initAlphaChart2);
-
-  // ===== Comments (localStorage) =====
-  const list = document.getElementById('commentList');
-  function addComment(){
-    const input = document.getElementById('commentInput');
-    const txt = input.value.trim();
-    if(!txt) return;
-    const comments = JSON.parse(localStorage.getItem('comments')||'[]');
-    const item = {t: Date.now(), text: txt};
-    comments.push(item);
-    localStorage.setItem('comments', JSON.stringify(comments));
-    input.value = '';
-    renderComments();
-    toast('Saved.');
-  }
-  function clearComments(){ localStorage.removeItem('comments'); renderComments(); toast('Cleared.'); }
-  function renderComments(){
-    list.innerHTML='';
-    const comments = JSON.parse(localStorage.getItem('comments')||'[]');
-    comments.slice().reverse().forEach(c=>{
-      const div = document.createElement('div');
-      div.style.cssText='background:#0d1831;border-left:4px solid #4ea0ff;padding:10px;border-radius:8px;margin:8px 0;';
-      const d = new Date(c.t);
-      div.innerHTML = `<strong>${d.toLocaleString()}</strong><br>${escapeHtml(c.text)}`;
-      list.appendChild(div);
-    });
-  }
-  function escapeHtml(s){ return s.replace(/[&<>\"]/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m])); }
-  window.addEventListener('load', renderComments);
-
-  function toast(msg){
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.style.display='block';
-    setTimeout(()=> t.style.display='none', 1600);
-  }
 </script>
 
 </body>
