@@ -7,17 +7,15 @@
   <meta name="description" content="Reactive routing for marine debris collection (TOP‑MT): methods, results, figures, and an interactive demo." />
 
   <!-- EmailJS (client-side) -->
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/emailjs-com@3.11.0/dist/email.min.js"></script>
   <script>
-  const EMAILJS_PUBLIC_KEY  = "ADVU4PI9eUMlMMsD2";
-  const EMAILJS_SERVICE_ID  = "service_glsv9dm";
-  const EMAILJS_TEMPLATE_ID = "template_as29om9";
-
-  document.addEventListener('DOMContentLoaded', () => {
-    emailjs.init(EMAILJS_PUBLIC_KEY);
-  });
+    const EMAILJS_PUBLIC_KEY  = "ADVU4PI9eUMlMMsD2";
+    const EMAILJS_SERVICE_ID  = "service_glsv9dm";
+    const EMAILJS_TEMPLATE_ID = "template_as29om9";
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.emailjs) emailjs.init(EMAILJS_PUBLIC_KEY);
+    });
   </script>
-
 
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,14 +24,14 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Ctext y='0.9em' font-size='200'%3E%F0%9F%8C%8A%3C/text%3E%3C/svg%3E"/>
 
   <!-- MathJax for equations -->
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script defer src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <!-- Chart.js (for the two alpha charts) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
-    :root{ --bg:#0b1220; --bg-soft:#0f172a; --panel:#111827; --text:#e5e7eb; --muted:#94a3b8; --brand:#3b82f6; --brand-2:#06b6d4; --card:#0b132f; --shadow:0 10px 30px rgba(0,0,0,.35); }
+    :root{ --bg:#0b1220; --text:#e5e7eb; --muted:#94a3b8; --brand:#3b82f6; --brand-2:#06b6d4; --card:#0c152b; --border:#152241; --shadow:0 10px 30px rgba(0,0,0,.35); }
     *{box-sizing:border-box}
     body{margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background:radial-gradient(1200px 800px at 80% -10%, rgba(6,182,212,.12), transparent 60%), radial-gradient(1200px 900px at -10% 20%, rgba(59,130,246,.12), transparent 60%), var(--bg); color:var(--text); line-height:1.55}
     a{color:var(--brand)}
@@ -50,7 +48,7 @@
     section.active{display:block}
     .grid{display:grid; gap:16px}
     .grid.cols-3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-    .card{background:#0c152b; border:1px solid #152241; border-radius:16px; padding:16px; box-shadow:var(--shadow)}
+    .card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:var(--shadow)}
     .muted{color:var(--muted)}
     .kpi{display:flex; gap:16px; flex-wrap:wrap}
     .kpi .pill{flex:1 1 220px; background:#0b1326; border:1px solid #1b2a4d; border-radius:14px; padding:14px}
@@ -62,18 +60,10 @@
     .equation{text-align:center; font-size:1.05rem; margin:10px 0 0}
     .comment{background:#0d1831; border-left:4px solid var(--brand); padding:12px 14px; border-radius:8px; margin:10px 0}
     footer{max-width:1200px; margin:0 auto; color:#9fb3e3; padding:30px 16px 80px; border-top:1px solid #172036}
-    /* Password modal */
-    .modal{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(3,6,12,.6); z-index:100}
-    .modal .box{width:min(520px,92vw); background:#0b1429; border:1px solid #1b2a4d; border-radius:16px; padding:20px}
-    .field{display:flex; gap:8px; margin-top:10px}
-    .field input{flex:1; background:#0b1220; color:#e5e7eb; border:1px solid #22345a; border-radius:10px; padding:12px}
     .toast{position:fixed; right:16px; bottom:16px; background:#0b1429; border:1px solid #26406f; color:#d2defa; padding:10px 12px; border-radius:10px; display:none}
   </style>
 </head>
-  
 <body>
-
-
 
 <header class="hero">
   <div class="badge">Operations Research · Environmental Analytics</div>
@@ -225,7 +215,7 @@
       <div class="card" style="grid-column:1/-1">
         <h2>🎥 Simulation Video</h2>
         <div class="media">
-          <video controls>
+          <video controls preload="metadata">
             <source src="neu.mov" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
@@ -246,35 +236,25 @@
   </section>
 
   <!-- POSTER -->
-<section id="poster">
-  <h3>📊 Poster</h3>
-  <div class="iframe-container" style="padding-bottom:0;height:1000px">
-    <iframe src="poster.pdf"></iframe>
-  </div>
-  <p><a href="poster.pdf" download>⬇️ Download poster</a></p>
-</section>
-
+  <section id="poster">
+    <div class="card">
+      <h2>📊 Poster</h2>
+      <div class="media" style="padding-bottom:140%"><embed src="poster.pdf" type="application/pdf"/></div>
+      <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap">
+        <a class="btn" href="poster.pdf" download>Download poster</a>
+      </div>
+    </div>
+  </section>
 
   <!-- COMMENTS -->
   <section id="comments">
-  <textarea id="commentInput" placeholder="Leave a comment..." rows="4" style="width:100%;max-width:800px;"></textarea>
-<br><br>
-<button onclick="addComment()">Submit</button>
-<div id="commentList" style="margin-top:20px;"></div>
-
-<!-- Toast-Feedback -->
-<div id="toast" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-background:#333;color:#fff;padding:10px 20px;border-radius:5px;"></div>
-
-
-    
     <div class="card">
       <h2>💬 Comments</h2>
       <p class="muted">Stored locally in your browser. Also emails you via EmailJS/GMX.</p>
       <div style="display:flex; gap:8px; flex-wrap:wrap">
         <input id="commentInput" type="text" placeholder="Leave a comment…" style="flex:1; background:#0b1220; color:#e5e7eb; border:1px solid #22345a; border-radius:10px; padding:10px"/>
         <button class="btn" onclick="addComment()">Submit</button>
-        <button class="btn secondary" onclick="clearComments()">Clear</button>
+        <button class="btn" style="background:#111827;border:1px solid #1f2937;color:#e5e7eb" onclick="clearComments()">Clear</button>
       </div>
       <div id="commentList" style="margin-top:12px"></div>
     </div>
@@ -297,112 +277,87 @@ background:#333;color:#fff;padding:10px 20px;border-radius:5px;"></div>
 
 <footer>
   <p><strong>Paulina Heine</strong> · August 2025 · GitHub Pages Presentation</p>
-  <p class="muted">Vanilla HTML/CSS/JS + MathJax + Chart.js · Private preview protected.</p>
+  <p class="muted">Vanilla HTML/CSS/JS + MathJax + Chart.js.</p>
 </footer>
 
 <div id="toast" class="toast" role="status" aria-live="polite">Saved.</div>
 
 <script>
-  // ===== Password Gate =====
-
-
   // ===== Tabs =====
   const tabs = document.querySelectorAll('nav.tabs button');
   const sections = [...document.querySelectorAll('main section')];
   tabs.forEach(btn => btn.addEventListener('click', ()=>activateTab(btn.dataset.tab)));
   function activateTab(id){
+    if (!id) return;
     tabs.forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
     sections.forEach(s=>s.classList.toggle('active', s.id===id));
     history.replaceState(null, '', '#'+id);
-    window.scrollTo({top: document.querySelector('nav.tabs').offsetTop, behavior:'smooth'});
+    const top = document.querySelector('nav.tabs').offsetTop;
+    window.scrollTo({top, behavior:'smooth'});
   }
   window.addEventListener('load', ()=>{ const h = location.hash.replace('#',''); if(h && document.getElementById(h)) activateTab(h); });
 
-<script>
   // ===== Comments (localStorage + EmailJS) =====
   const list = document.getElementById('commentList');
-
   function addComment(){
     const input = document.getElementById('commentInput');
     const txt = input.value.trim();
     if(!txt) return;
 
-    // Lokal speichern
-    const comments = JSON.parse(localStorage.getItem('comments')||'[]');
-    const item = {t: Date.now(), text: txt, page: location.href};
-    comments.push(item);
-    localStorage.setItem('comments', JSON.stringify(comments));
-    input.value = '';
-    renderComments();
-    toast('Saved.');
+    try {
+      const comments = JSON.parse(localStorage.getItem('comments')||'[]');
+      const item = {t: Date.now(), text: txt, page: location.href};
+      comments.push(item);
+      localStorage.setItem('comments', JSON.stringify(comments));
+      input.value = '';
+      renderComments();
+      toast('Saved.');
 
-    // Email senden
-    if (typeof emailjs !== 'undefined'){
-      const params = {
-        comment_text: item.text,
-        page_url: item.page,
-        time_iso: new Date(item.t).toISOString()
-      };
-      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
-        .then(()=> toast('Email sent ✅'))
-        .catch(err=> {
-          console.warn('EmailJS send failed', err);
-          toast('Email failed ❌');
-        });
-    }
+      if (window.emailjs){
+        const params = { comment_text: item.text, page_url: item.page, time_iso: new Date(item.t).toISOString() };
+        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
+          .then(()=>toast('Email sent ✅'))
+          .catch(err=>{ console.warn('EmailJS send failed', err); toast('Email failed ❌'); });
+      }
+    } catch(e) { console.error('Failed to save comment:', e); }
   }
-
   function renderComments(){
     list.innerHTML='';
-    const comments = JSON.parse(localStorage.getItem('comments')||'[]');
-    comments.slice().reverse().forEach(c=>{
-      const div = document.createElement('div');
-      div.className='comment';
-      const d = new Date(c.t);
-      div.innerHTML = `<strong>${d.toLocaleString()}</strong><br>${escapeHtml(c.text)}`;
-      list.appendChild(div);
-    });
+    try {
+      const comments = JSON.parse(localStorage.getItem('comments')||'[]');
+      comments.slice().reverse().forEach(c=>{
+        const div = document.createElement('div');
+        div.className='comment';
+        const d = new Date(c.t);
+        div.innerHTML = `<strong>${d.toLocaleString()}</strong><br>${escapeHtml(c.text)}`;
+        list.appendChild(div);
+      });
+    } catch(e) { console.error('Failed to render comments:', e); }
   }
-
-  function clearComments(){
-    localStorage.removeItem('comments');
-    renderComments();
-    toast('Cleared.');
-  }
-
-  function escapeHtml(s){
-    return s.replace(/[&<>"]/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m]));
-  }
-
+  function clearComments(){ localStorage.removeItem('comments'); renderComments(); toast('Cleared.'); }
+  function escapeHtml(s){ return s.replace(/[&<>\"]/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m])); }
   window.addEventListener('load', renderComments);
-
-  function toast(msg){
-    const t=document.getElementById('toast');
-    t.textContent=msg;
-    t.style.display='block';
-    setTimeout(()=> t.style.display='none',1600);
-  }
-</script>
+  function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=> t.style.display='none',1600); }
 
   // ===== Alpha Charts =====
   let chart1; let chart2;
   function initAlphaChart(){
-    const ctx = document.getElementById('alphaChart'); if(!ctx) return;
+    const ctx = document.getElementById('alphaChart'); if(!ctx || !window.Chart) return;
     const data = [22136,24000,26000,27000,28000,29000,30000,30500,29043,26000,23000];
     const labels = [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0];
     chart1 = new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'Collected value',data,tension:.3}]},options:{plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'alpha'}},y:{title:{display:true,text:'value'}}}}});
   }
-  function updateAlpha(a){ const v=(+a).toFixed(2); document.getElementById('alphaValue').textContent=v; document.getElementById('alphaBias').textContent=(+a<0.5?'Value‑leaning':(+a>0.5?'Proximity‑leaning':'Balanced')); }
+  function updateAlpha(a){ const v=(+a).toFixed(2); const el1=document.getElementById('alphaValue'); const el2=document.getElementById('alphaBias'); if(el1) el1.textContent=v; if(el2) el2.textContent=(+a<0.5?'Value‑leaning':(+a>0.5?'Proximity‑leaning':'Balanced')); }
   window.addEventListener('load', initAlphaChart);
 
   function initAlphaChart2(){
-    const ctx = document.getElementById('alphaChart2'); if(!ctx) return;
+    const ctx = document.getElementById('alphaChart2'); if(!ctx || !window.Chart) return;
     const labels = Array.from({length:21},(_,i)=>(i/20).toFixed(2));
     const base = labels.map(x=> toyValue(+x));
     chart2 = new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'value (toy)',data:base,tension:.35}]},options:{plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'alpha'}},y:{title:{display:true,text:'value (arb.)'}}}}});
   }
   function toyValue(a){ const peak=0.8, width=0.45; const base=Math.exp(-Math.pow((a-peak)/width,2)); return Math.round((0.7+0.35*base+0.02*Math.sin(10*a))*1000)/1; }
-  function updateAlpha2(a){ const v=(+a).toFixed(2); document.getElementById('alphaValue2').textContent=v; if(!chart2) return; chart2.data.datasets[0].data = chart2.data.labels.map(l=> toyValue(parseFloat(l))); chart2.update('none'); }
+  function updateAlpha2(a){ const v=(+a).toFixed(2); const el=document.getElementById('alphaValue2'); if(el) el.textContent=v; if(!chart2) return; chart2.data.datasets[0].data = chart2.data.labels.map(l=> toyValue(parseFloat(l))); chart2.update('none'); }
   window.addEventListener('load', initAlphaChart2);
 </script>
 
