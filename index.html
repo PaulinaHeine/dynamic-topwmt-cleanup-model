@@ -4,25 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dynamic Routing for Marine Debris Collection · Interactive Demo</title>
-  <meta name="description" content="Interactive demonstration of reactive routing for marine debris collection (TOP-MT): mathematical model, heuristic logic, results, and media." />
+  <meta name="description" content="Reactive routing for marine debris collection (TOP-MT): methods, results, figures, and an interactive demo." />
 
-  <!-- Fonts -->
+  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Ctext y='0.9em' font-size='200'%3E%F0%9F%8C%8A%3C/text%3E%3C/svg%3E"/>
 
-  <!-- MathJax for LaTeX rendering -->
+  <!-- MathJax for equations -->
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-  <!-- Chart.js -->
+  
+  <!-- Chart.js (small, CDN) for one interactive chart -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
-    /* Color Scheme */
     :root{
-      --bg: #0b1220;
+      --bg: #0b1220; /* dark base */
       --bg-soft:#0f172a;
       --panel:#111827;
       --text:#e5e7eb;
@@ -35,70 +34,6 @@
       --card:#0b132f;
       --shadow: 0 10px 30px rgba(0,0,0,.35);
     }
-
-    /* General */
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;padding:0}
-    body{
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background: radial-gradient(1200px 800px at 80% -10%, rgba(6,182,212,.12), transparent 60%),
-                  radial-gradient(1200px 900px at -10% 20%, rgba(59,130,246,.12), transparent 60%), var(--bg);
-      color: var(--text);
-      line-height: 1.55;
-    }
-    a{color:var(--brand)}
-
-    /* Hero */
-    header.hero{
-      padding: 64px 20px 24px; text-align:center; position: relative;
-    }
-    .badge{display:inline-block; padding:.35rem .6rem; border:1px solid #2d3b55; border-radius:999px; background:linear-gradient(90deg, rgba(59,130,246,.15), rgba(6,182,212,.15)); color:#c7d2fe; font-weight:600;}
-    .title{font-size: clamp(28px, 6vw, 48px); margin: 16px auto 8px; font-weight: 800;}
-    .subtitle{max-width:900px; margin: 0 auto; color:var(--muted)}
-
-    /* Buttons */
-    .btn{border:none; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer; box-shadow:var(--shadow)}
-    .btn.primary{background:linear-gradient(135deg, var(--brand), var(--brand-2)); color:#0b1220;}
-    .btn.secondary{background:#111827; color:#e5e7eb; border:1px solid #1f2937}
-    .btn.ghost{background:transparent; color:var(--text); border:1px dashed #2b364d}
-
-    /* Tabs */
-    nav.tabs{position:sticky; top:0; background:rgba(10,17,33,.7); backdrop-filter:saturate(160%) blur(8px); border-bottom:1px solid #172036; z-index:50;}
-    nav.tabs .wrap{max-width:1200px; margin:auto; display:flex; gap:8px; padding:10px}
-    nav.tabs button{flex:1; min-width:120px; background:#0d162b; color:#bcd1ff; border:1px solid #1a2540; padding:12px; border-radius:10px; cursor:pointer; font-weight:700}
-    nav.tabs button.active{background:linear-gradient(135deg, rgba(59,130,246,.3), rgba(6,182,212,.3)); border-color:#23406e}
-
-    /* Layout */
-    main{max-width:1200px; margin:auto; padding: 24px 16px 80px}
-    section{display:none}
-    section.active{display:block}
-    .grid{display:grid; gap:16px}
-    .grid.cols-3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-    .two-col{display:grid; gap:18px; grid-template-columns:1.2fr .8fr}
-    @media (max-width: 920px){.two-col{grid-template-columns:1fr}}
-
-    .card{background: #0c152b; border:1px solid #152241; border-radius:16px; padding:16px; box-shadow:var(--shadow)}
-    .muted{color:var(--muted)}
-    .pill{background:#0b1326; border:1px solid #1b2a4d; border-radius:14px; padding:14px; flex:1}
-    .pill .lbl{font-size:12px; color:#8aa3d7; letter-spacing:.4px; text-transform:uppercase}
-    .pill .val{font-size:22px; font-weight:800}
-
-    .media{position:relative; overflow:hidden; border-radius:16px; border:1px solid #213357; background:#0a1326}
-    .media::after{content:""; display:block; padding-bottom:56.25%}
-    .media>*{position:absolute; inset:0; width:100%; height:100%; border:0; object-fit:cover}
-
-    .equation{text-align:center; font-size:1.05rem; margin-top:10px}
-
-    table{width:100%; border-collapse:collapse; font-size:.95rem; background:#0b1429; border:1px solid #1e2f54; border-radius:12px; overflow:hidden}
-    thead{background:#0e1a36}
-    th,td{padding:10px 12px; border-bottom:1px solid #1a2a4b; text-align:left}
-    tr:hover td{background:#0c1831}
-  </style>
-</head>
-<body>
-  <!-- Content structure preserved, but trimmed for brevity in this draft -->
-</body>
-</html>
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
@@ -227,14 +162,6 @@
         <div class="tag">Drift‑aware</div>
         <div class="tag">No return‑to‑depot</div>
         <div class="tag">Greedy + Retargeting</div>
-      </div>
-              <h3 style="margin-top:14px">How hotspots are modeled</h3>
-        <ul>
-          <li><strong>Seeding:</strong> we seed many floating particles over the surface (initial debris field).</li>
-          <li><strong>Clustering:</strong> particles are grouped by proximity into <em>compact clusters</em> → each cluster = one hotspot.</li>
-          <li><strong>Value:</strong> hotspot value $v_i$ is proportional to its initial cluster size (mass proxy). Once collected, $v_i\to 0$ and the hotspot is deactivated.</li>
-          <li><strong>Drift:</strong> both vessels and hotspots are advected by the same surface current reader at their locations.</li>
-        </ul>
       </div>
       <div class="card">
         <h3>Illustration</h3>
