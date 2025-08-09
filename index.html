@@ -316,17 +316,7 @@ background:#333;color:#fff;padding:10px 20px;border-radius:5px;"></div>
 
 <script>
   // ===== Password Gate =====
-  const PASSWORD = "chris+ina";
-  const gate = document.getElementById('gate');
-  const pwInput = document.getElementById('pw');
-  const pwMsg = document.getElementById('pwMsg');
-  function unlock(){
-    const v = (pwInput.value||'').trim();
-    if(v === PASSWORD){ gate.style.display='none'; localStorage.setItem('siteUnlocked','1'); }
-    else { pwMsg.textContent = '❌ Wrong password'; pwMsg.style.color = '#fda4af'; }
-  }
-  (function(){ if(localStorage.getItem('siteUnlocked')==='1'){ gate.style.display='none'; }})();
-  pwInput?.addEventListener('keyup', (e)=>{ if(e.key==='Enter') unlock(); });
+
 
   // ===== Tabs =====
   const tabs = document.querySelectorAll('nav.tabs button');
