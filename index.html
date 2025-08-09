@@ -2,421 +2,73 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dynamic Routing for Marine Debris Collection · Interactive Demo</title>
-  <meta name="description" content="Reactive routing for marine debris collection (TOP‑MT): methods, results, figures, and an interactive demo." />
-
-  <!-- EmailJS (client-side) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Demo – Comments with EmailJS</title>
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <script>
-  const EMAILJS_PUBLIC_KEY  = "ADVU4PI9eUMlMMsD2";
-  const EMAILJS_SERVICE_ID  = "service_glsv9dm";
-  const EMAILJS_TEMPLATE_ID = "template_as29om9";
+    const EMAILJS_PUBLIC_KEY  = "ADVU4PI9eUMlMMsD2";
+    const EMAILJS_SERVICE_ID  = "service_glsv9dm";
+    const EMAILJS_TEMPLATE_ID = "template_as29om9";
 
-  document.addEventListener('DOMContentLoaded', () => {
-    emailjs.init(EMAILJS_PUBLIC_KEY);
-  });
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.emailjs) {
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+      } else {
+        console.error("EmailJS failed to load");
+      }
+      renderComments();
+    });
+
+    function addComment(){
+      const input = document.getElementById('commentInput');
+      const txt = input.value.trim();
+      if(!txt) return;
+
+      const comments = JSON.parse(localStorage.getItem('comments')||'[]');
+      const item = {t: Date.now(), text: txt, page: location.href};
+      comments.push(item);
+      localStorage.setItem('comments', JSON.stringify(comments));
+      input.value = '';
+      renderComments();
+
+      if (window.emailjs) {
+        const params = {
+          comment_text: item.text,
+          page_url: item.page,
+          time_iso: new Date(item.t).toISOString()
+        };
+        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
+          .then(()=>console.log('Email sent'))
+          .catch(err=>console.warn('Email send failed', err));
+      }
+    }
+
+    function renderComments(){
+      const list = document.getElementById('commentList');
+      list.innerHTML = '';
+      const comments = JSON.parse(localStorage.getItem('comments')||'[]');
+      comments.slice().reverse().forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'comment';
+        const d = new Date(c.t);
+        div.innerHTML = `<strong>${d.toLocaleString()}</strong><br>${escapeHtml(c.text)}`;
+        list.appendChild(div);
+      });
+    }
+
+    function escapeHtml(s){
+      return s.replace(/[&<>\"]/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m]));
+    }
   </script>
-
-
-  <!-- Fonts & Icons -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Ctext y='0.9em' font-size='200'%3E%F0%9F%8C%8A%3C/text%3E%3C/svg%3E"/>
-
-  <!-- MathJax for equations -->
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-  <!-- Chart.js (for the two alpha charts) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
   <style>
-    :root{ --bg:#0b1220; --bg-soft:#0f172a; --panel:#111827; --text:#e5e7eb; --muted:#94a3b8; --brand:#3b82f6; --brand-2:#06b6d4; --card:#0b132f; --shadow:0 10px 30px rgba(0,0,0,.35); }
-    *{box-sizing:border-box}
-    body{margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background:radial-gradient(1200px 800px at 80% -10%, rgba(6,182,212,.12), transparent 60%), radial-gradient(1200px 900px at -10% 20%, rgba(59,130,246,.12), transparent 60%), var(--bg); color:var(--text); line-height:1.55}
-    a{color:var(--brand)}
-    header.hero{padding:64px 20px 24px; text-align:center}
-    .badge{display:inline-block; padding:.35rem .6rem; border:1px solid #2d3b55; border-radius:999px; color:#c7d2fe; font-weight:600; background:linear-gradient(90deg, rgba(59,130,246,.15), rgba(6,182,212,.15))}
-    .title{font-size:clamp(28px,6vw,48px); margin:16px auto 8px; font-weight:800}
-    .subtitle{max-width:900px; margin:0 auto; color:var(--muted)}
-    nav.tabs{position:sticky; top:0; z-index:50; backdrop-filter:saturate(160%) blur(8px); background:rgba(10,17,33,.7); border-bottom:1px solid #172036}
-    nav.tabs .wrap{max-width:1200px; margin:auto; display:flex; gap:8px; padding:10px}
-    nav.tabs button{flex:1 1 auto; min-width:120px; background:#0d162b; color:#bcd1ff; border:1px solid #1a2540; padding:12px; border-radius:10px; cursor:pointer; font-weight:700}
-    nav.tabs button.active{background:linear-gradient(135deg, rgba(59,130,246,.3), rgba(6,182,212,.3)); border-color:#23406e}
-    main{max-width:1200px; margin:0 auto; padding:24px 16px 80px}
-    section{display:none}
-    section.active{display:block}
-    .grid{display:grid; gap:16px}
-    .grid.cols-3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-    .card{background:#0c152b; border:1px solid #152241; border-radius:16px; padding:16px; box-shadow:var(--shadow)}
-    .muted{color:var(--muted)}
-    .kpi{display:flex; gap:16px; flex-wrap:wrap}
-    .kpi .pill{flex:1 1 220px; background:#0b1326; border:1px solid #1b2a4d; border-radius:14px; padding:14px}
-    .pill .lbl{font-size:12px; color:#8aa3d7; letter-spacing:.4px; text-transform:uppercase}
-    .pill .val{font-size:22px; font-weight:800}
-    .media{position:relative; width:100%; overflow:hidden; border-radius:16px; border:1px solid #213357; background:#0a1326}
-    .media::after{content:""; display:block; padding-bottom:56.25%}
-    .media>*{position:absolute; inset:0; width:100%; height:100%; border:0}
-    .equation{text-align:center; font-size:1.05rem; margin:10px 0 0}
-    .comment{background:#0d1831; border-left:4px solid var(--brand); padding:12px 14px; border-radius:8px; margin:10px 0}
-    footer{max-width:1200px; margin:0 auto; color:#9fb3e3; padding:30px 16px 80px; border-top:1px solid #172036}
-    /* Password modal */
-    .modal{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(3,6,12,.6); z-index:100}
-    .modal .box{width:min(520px,92vw); background:#0b1429; border:1px solid #1b2a4d; border-radius:16px; padding:20px}
-    .field{display:flex; gap:8px; margin-top:10px}
-    .field input{flex:1; background:#0b1220; color:#e5e7eb; border:1px solid #22345a; border-radius:10px; padding:12px}
-    .toast{position:fixed; right:16px; bottom:16px; background:#0b1429; border:1px solid #26406f; color:#d2defa; padding:10px 12px; border-radius:10px; display:none}
+    body { font-family: sans-serif; padding: 20px; }
+    .comment { background:#f0f0f0; margin:5px 0; padding:8px; border-radius:4px; }
   </style>
 </head>
-  
 <body>
-
-<!-- PASSWORD GATE (modal) -->
-<div id="gate" class="modal" role="dialog" aria-modal="true" aria-labelledby="pwTitle">
-  <div class="box">
-    <span class="badge">Private Preview</span>
-    <h2 id="pwTitle">Enter access password</h2>
-    <p class="muted">Restricted content for research/demo.</p>
-    <div class="field">
-      <input id="pw" type="password" placeholder="Password" autocomplete="off" />
-      <button class="btn" onclick="unlock()">Unlock</button>
-    </div>
-    <p id="pwMsg" class="muted" style="margin-top:8px"></p>
-  </div>
-</div>
-
-<header class="hero">
-  <div class="badge">Operations Research · Environmental Analytics</div>
-  <h1 class="title">Dynamic Routing for Marine Debris Collection</h1>
-  <p class="subtitle">Reactive planning under ocean currents. TOP‑MT model, greedy drift‑aware heuristic, and interactive views.</p>
-</header>
-
-<nav class="tabs" aria-label="Sections">
-  <div class="wrap">
-    <button data-tab="problem" class="active">📍 Problem</button>
-    <button data-tab="math">📐 Model</button>
-    <button data-tab="logic">🧠 Heuristic</button>
-    <button data-tab="results">📊 Results</button>
-    <button data-tab="demo">🕹️ Interactive</button>
-    <button data-tab="media">🎥 Media</button>
-    <button data-tab="paper">📄 Paper</button>
-    <button data-tab="poster">📊 Poster</button>
-    <button data-tab="comments">💬 Comments</button>
-    <button data-tab="refs">🔗 References</button>
-  </div>
-</nav>
-
-<main>
-  <!-- PROBLEM -->
-  <section id="problem" class="active">
-    <div class="grid cols-3">
-      <div class="card" style="grid-column:1/-1">
-        <h2>📍 Problem Setting</h2>
-        <p>Plastic patches (<em>hotspots</em>) drift with surface currents. Objective: <strong>maximize collected value</strong> within a time horizon via <strong>reactive fleet routing</strong>. Each hotspot has a location, a value (mass proxy), and a drift trajectory.</p>
-        <div class="kpi">
-          <div class="pill"><div class="lbl">Problem class</div><div class="val">TOP‑MT</div></div>
-          <div class="pill"><div class="lbl">Fleet</div><div class="val">1–5 vessels (heterog.)</div></div>
-          <div class="pill"><div class="lbl">Decision step</div><div class="val">Δt (seconds–minutes)</div></div>
-          <div class="pill"><div class="lbl">Targets</div><div class="val">Drifting hotspots</div></div>
-        </div>
-        <p class="muted">Hotspots originate from clustered particles. Values are proportional to initial cluster size. On collection, value → 0 and the hotspot is deactivated.</p>
-      </div>
-      <div class="card" style="grid-column:1/-1">
-        <h3>Illustration</h3>
-        <div class="media"><img src="Bildschirmfoto 2025-08-06 um 12.10.13.png" alt="Greedy trade-offs" style="object-fit:cover"></div>
-        <p class="muted">Proximity‑only vs value‑only vs balanced α.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- MODEL -->
-  <section id="math">
-    <div class="grid cols-3">
-      <div class="card">
-        <h2>📐 Mathematical Model</h2>
-        <p>We model the task as a <strong>Team Orienteering Problem with Moving Targets</strong>. Over a horizon <span class="equation">\(T=\{0,1,\dots,\mathcal{T}\}\)</span>, a fleet \(K\) collects targets \(N_t\) with values \(\pi_i(t)\) at positions \(p_i(t)\).</p>
-        <p class="equation">\[ \max \sum_{t\in T}\sum_{k\in K}\sum_{i\in N_t} \pi_i(t)\, x_{i,k}(t) \]</p>
-        <h4>Decision variables</h4>
-        <ul>
-          <li>\(z_{i,k}(t)\in\{0,1\}\): vessel \(k\) targets \(i\) at \(t\)</li>
-          <li>\(x_{i,k}(t):=\mathbf{I}[\lVert q_k(t)-p_i(t)\rVert\le\varepsilon\wedge z_{i,k}(t)=1]\)</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>Constraints</h3>
-        <ul>
-          <li>(C1) Unique collection: \(\sum_{t,k} x_{i,k}(t) \le 1\)</li>
-          <li>(C2) One target per vessel & time: \(\sum_i z_{i,k}(t) \le 1\)</li>
-          <li>(C3) Vessel dynamics: <span class="equation">\(q_k(t{+}1)=q_k(t)+v_k u_k(t)\,\Delta t + c_k(t)\,\Delta t\)</span></li>
-          <li>(C4) Initial position: \(q_k(0)=q_k^{\text{start}}\)</li>
-          <li>(C5) Non‑overlap pursuit: \(\sum_k z_{i,k}(t)\le 1\)</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>Scoring (Greedy)</h3>
-        <p class="equation">\[ S_i=\alpha\Big(1-\tfrac{d_i}{d_{\max}}\Big)+(1-\alpha)\Big(\tfrac{v_i}{v_{\max}}\Big) \]</p>
-        <p class="muted">\(\alpha\in[0,1]\) tunes proximity vs value. Normalization ensures scale‑invariance.</p>
-      </div>
-    </div>
-    <div class="card" style="margin-top:16px">
-      <h3>Motion Models</h3>
-      <div class="grid cols-3">
-        <div>
-          <h4>Plastic (Hotspots)</h4>
-          <p class="equation">\(p_i(t{+}1)=p_i(t)+c_i(t)\,\Delta t\)</p>
-          <p class="muted">Advected by surface currents at the hotspot position.</p>
-        </div>
-        <div>
-          <h4>Vessels</h4>
-          <p class="equation">\(q_k(t{+}1)=q_k(t)+v_k u_k(t)\,\Delta t + c_k(t)\,\Delta t\)</p>
-          <p class="muted">Self‑propulsion towards the assigned target + drift.</p>
-        </div>
-        <div>
-          <h4>Value</h4>
-          <p>Hotspot value \(v_i\) is proportional to initial cluster size; once collected, \(v_i\to 0\).</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- HEURISTIC -->
-  <section id="logic">
-    <div class="grid cols-3">
-      <div class="card" style="grid-column:1/-1">
-        <h2>🧠 Reactive Greedy + Retargeting</h2>
-        <ol>
-          <li>Evaluate active hotspots</li>
-          <li>Score via \(S_i\) and assign a target</li>
-          <li>Navigate until within \(\varepsilon\)</li>
-          <li>Collect, deactivate, repeat</li>
-        </ol>
-        <div class="comment">Extreme strategies underperform: proximity‑only misses value; value‑only causes long detours. Balanced \(\alpha\) wins.</div>
-      </div>
-      <div class="card">
-        <h3>Alpha slider</h3>
-        <p class="muted">Adjust \(\alpha\) to see the weighting.</p>
-        <input id="alphaRange" type="range" min="0" max="1" step="0.01" value="0.8" oninput="updateAlpha(this.value)" style="width:100%"/>
-        <p>Current \(\alpha\): <strong><span id="alphaValue">0.80</span></strong> · Bias: <span id="alphaBias">Proximity‑leaning</span></p>
-        <canvas id="alphaChart" aria-label="Collected value vs alpha"></canvas>
-      </div>
-    </div>
-  </section>
-
-  <!-- RESULTS -->
-  <section id="results">
-    <div class="card">
-      <h2>📊 Key Findings</h2>
-      <ul>
-        <li><strong>Dynamic allocation</strong> outperforms static plans.</li>
-        <li>Best performance often near <strong>\(\alpha\approx 0.8\)</strong>.</li>
-        <li>Retargeting improves value and distance efficiency.</li>
-      </ul>
-    </div>
-    <div class="card" style="margin-top:16px">
-      <h3>Alpha comparison (figure)</h3>
-      <div class="media"><img src="AlphaVgl.png" alt="Alpha comparison chart" style="object-fit:cover"></div>
-    </div>
-  </section>
-
-  <!-- INTERACTIVE DEMO -->
-  <section id="demo">
-    <div class="card">
-      <h2>🕹️ Interactive: α trade‑off explorer</h2>
-      <p>Drag the slider; the chart shows a toy response curve.</p>
-      <input id="alphaRange2" type="range" min="0" max="1" step="0.01" value="0.8" oninput="updateAlpha2(this.value)" style="width:100%"/>
-      <p>α = <strong><span id="alphaValue2">0.80</span></strong></p>
-      <canvas id="alphaChart2"></canvas>
-    </div>
-  </section>
-
-  <!-- MEDIA -->
-  <section id="media">
-    <div class="grid cols-3">
-      <div class="card" style="grid-column:1/-1">
-        <h2>🎥 Simulation Video</h2>
-        <div class="media">
-          <video controls>
-            <source src="neu.mov" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PAPER -->
-  <section id="paper">
-    <div class="card">
-      <h2>📄 Full Paper</h2>
-      <div class="media" style="padding-bottom:120%"><embed src="Reactive_Planning_for_Marine_Debris_Collection_in_Dynamic_Ocean_Environments_Paper.pdf" type="application/pdf"/></div>
-      <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap">
-        <a class="btn" href="Reactive_Planning_for_Marine_Debris_Collection_in_Dynamic_Ocean_Environments_Paper.pdf" download>Download paper</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- POSTER -->
-<section id="poster">
-  <h3>📊 Poster</h3>
-  <div class="iframe-container" style="padding-bottom:0;height:1000px">
-    <iframe src="poster.pdf"></iframe>
-  </div>
-  <p><a href="poster.pdf" download>⬇️ Download poster</a></p>
-</section>
-
-
-  <!-- COMMENTS -->
-  <section id="comments">
-  <textarea id="commentInput" placeholder="Leave a comment..." rows="4" style="width:100%;max-width:800px;"></textarea>
-<br><br>
-<button onclick="addComment()">Submit</button>
-<div id="commentList" style="margin-top:20px;"></div>
-
-<!-- Toast-Feedback -->
-<div id="toast" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-background:#333;color:#fff;padding:10px 20px;border-radius:5px;"></div>
-
-
-    
-    <div class="card">
-      <h2>💬 Comments</h2>
-      <p class="muted">Stored locally in your browser. Also emails you via EmailJS/GMX.</p>
-      <div style="display:flex; gap:8px; flex-wrap:wrap">
-        <input id="commentInput" type="text" placeholder="Leave a comment…" style="flex:1; background:#0b1220; color:#e5e7eb; border:1px solid #22345a; border-radius:10px; padding:10px"/>
-        <button class="btn" onclick="addComment()">Submit</button>
-        <button class="btn secondary" onclick="clearComments()">Clear</button>
-      </div>
-      <div id="commentList" style="margin-top:12px"></div>
-    </div>
-  </section>
-
-  <!-- REFS -->
-  <section id="refs">
-    <div class="card">
-      <h2>🔗 References & Data</h2>
-      <ul>
-        <li>Copernicus Marine Service – Global Ocean Physics Analysis & Forecast (CMEMS) – DOI: 10.48670/moi-00016</li>
-        <li>OpenDrift v1.0 – Generic framework for trajectory modelling (GMD 2018)</li>
-        <li>Evidence that the Great Pacific Garbage Patch is rapidly accumulating plastic (Sci. Reports 2018)</li>
-        <li>The Ocean Cleanup – Great Pacific Garbage Patch (background)</li>
-      </ul>
-      <p class="muted">See embedded paper/poster for full citations and settings.</p>
-    </div>
-  </section>
-</main>
-
-<footer>
-  <p><strong>Paulina Heine</strong> · August 2025 · GitHub Pages Presentation</p>
-  <p class="muted">Vanilla HTML/CSS/JS + MathJax + Chart.js · Private preview protected.</p>
-</footer>
-
-<div id="toast" class="toast" role="status" aria-live="polite">Saved.</div>
-
-<script>
-  // ===== Password Gate =====
-
-
-  // ===== Tabs =====
-  const tabs = document.querySelectorAll('nav.tabs button');
-  const sections = [...document.querySelectorAll('main section')];
-  tabs.forEach(btn => btn.addEventListener('click', ()=>activateTab(btn.dataset.tab)));
-  function activateTab(id){
-    tabs.forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
-    sections.forEach(s=>s.classList.toggle('active', s.id===id));
-    history.replaceState(null, '', '#'+id);
-    window.scrollTo({top: document.querySelector('nav.tabs').offsetTop, behavior:'smooth'});
-  }
-  window.addEventListener('load', ()=>{ const h = location.hash.replace('#',''); if(h && document.getElementById(h)) activateTab(h); });
-
-<script>
-  // ===== Comments (localStorage + EmailJS) =====
-  const list = document.getElementById('commentList');
-
-  function addComment(){
-    const input = document.getElementById('commentInput');
-    const txt = input.value.trim();
-    if(!txt) return;
-
-    // Lokal speichern
-    const comments = JSON.parse(localStorage.getItem('comments')||'[]');
-    const item = {t: Date.now(), text: txt, page: location.href};
-    comments.push(item);
-    localStorage.setItem('comments', JSON.stringify(comments));
-    input.value = '';
-    renderComments();
-    toast('Saved.');
-
-    // Email senden
-    if (typeof emailjs !== 'undefined'){
-      const params = {
-        comment_text: item.text,
-        page_url: item.page,
-        time_iso: new Date(item.t).toISOString()
-      };
-      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
-        .then(()=> toast('Email sent ✅'))
-        .catch(err=> {
-          console.warn('EmailJS send failed', err);
-          toast('Email failed ❌');
-        });
-    }
-  }
-
-  function renderComments(){
-    list.innerHTML='';
-    const comments = JSON.parse(localStorage.getItem('comments')||'[]');
-    comments.slice().reverse().forEach(c=>{
-      const div = document.createElement('div');
-      div.className='comment';
-      const d = new Date(c.t);
-      div.innerHTML = `<strong>${d.toLocaleString()}</strong><br>${escapeHtml(c.text)}`;
-      list.appendChild(div);
-    });
-  }
-
-  function clearComments(){
-    localStorage.removeItem('comments');
-    renderComments();
-    toast('Cleared.');
-  }
-
-  function escapeHtml(s){
-    return s.replace(/[&<>"]/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m]));
-  }
-
-  window.addEventListener('load', renderComments);
-
-  function toast(msg){
-    const t=document.getElementById('toast');
-    t.textContent=msg;
-    t.style.display='block';
-    setTimeout(()=> t.style.display='none',1600);
-  }
-</script>
-
-  // ===== Alpha Charts =====
-  let chart1; let chart2;
-  function initAlphaChart(){
-    const ctx = document.getElementById('alphaChart'); if(!ctx) return;
-    const data = [22136,24000,26000,27000,28000,29000,30000,30500,29043,26000,23000];
-    const labels = [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0];
-    chart1 = new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'Collected value',data,tension:.3}]},options:{plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'alpha'}},y:{title:{display:true,text:'value'}}}}});
-  }
-  function updateAlpha(a){ const v=(+a).toFixed(2); document.getElementById('alphaValue').textContent=v; document.getElementById('alphaBias').textContent=(+a<0.5?'Value‑leaning':(+a>0.5?'Proximity‑leaning':'Balanced')); }
-  window.addEventListener('load', initAlphaChart);
-
-  function initAlphaChart2(){
-    const ctx = document.getElementById('alphaChart2'); if(!ctx) return;
-    const labels = Array.from({length:21},(_,i)=>(i/20).toFixed(2));
-    const base = labels.map(x=> toyValue(+x));
-    chart2 = new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'value (toy)',data:base,tension:.35}]},options:{plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'alpha'}},y:{title:{display:true,text:'value (arb.)'}}}}});
-  }
-  function toyValue(a){ const peak=0.8, width=0.45; const base=Math.exp(-Math.pow((a-peak)/width,2)); return Math.round((0.7+0.35*base+0.02*Math.sin(10*a))*1000)/1; }
-  function updateAlpha2(a){ const v=(+a).toFixed(2); document.getElementById('alphaValue2').textContent=v; if(!chart2) return; chart2.data.datasets[0].data = chart2.data.labels.map(l=> toyValue(parseFloat(l))); chart2.update('none'); }
-  window.addEventListener('load', initAlphaChart2);
-</script>
-
+  <h1>Comments</h1>
+  <textarea id="commentInput" placeholder="Leave a comment..." rows="3" style="width:100%;max-width:500px;"></textarea><br>
+  <button onclick="addComment()">Submit</button>
+  <div id="commentList" style="margin-top:20px;"></div>
 </body>
 </html>
