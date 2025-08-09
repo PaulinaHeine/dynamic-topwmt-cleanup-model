@@ -6,6 +6,22 @@
   <title>Dynamic Routing for Marine Debris Collection · Interactive Demo</title>
   <meta name="description" content="Reactive routing for marine debris collection (TOP-MT): methods, results, figures, and an interactive demo." />
 
+ <!Mailstuff-->
+<!-- EmailJS (client-side email) -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>
+  // ⚙️ Replace with your EmailJS values:
+  const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";   // e.g., 'BaCdeFGhIjkLmNoP'
+  const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";   // e.g., 'service_xxxxxx'
+  const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID"; // e.g., 'template_xxxxxx'
+  const NOTIFY_EMAIL = "you@example.com";         // your address
+
+  document.addEventListener('DOMContentLoaded', () => {
+    try { emailjs.init(EMAILJS_PUBLIC_KEY); } catch(e) { console.warn('EmailJS init skipped:', e); }
+  });
+</script>
+
+  
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -135,6 +151,7 @@
     <button data-tab="demo">🕹️ Interactive</button>
     <button data-tab="media">🎥 Media</button>
     <button data-tab="paper">📄 Paper & Poster</button>
+    <button data-tab="poster">📄 Poster</button>
     <button data-tab="comments">💬 Comments</button>
     <button data-tab="refs">🔗 References</button>
   </div>
@@ -333,34 +350,60 @@
 
   <!-- PAPER -->
 <section id="paper">
-  <h2>📄 Paper & 📊 Poster</h2>
-  <div class="highlight">If the poster still doesn't show: filenames with spaces/umlauts can break embeds on some hosts. I encoded the URL and added a download link as fallback.</div>
-
-  <h3>Full Paper</h3>
+  <h2>📄 Full Paper</h2>
   <div class="iframe-container" style="padding-bottom:0;height:900px">
     <iframe src="Reactive_Planning_for_Marine_Debris_Collection_in_Dynamic_Ocean_Environments_Paper.pdf"></iframe>
   </div>
   <p><a href="Reactive_Planning_for_Marine_Debris_Collection_in_Dynamic_Ocean_Environments_Paper.pdf" download>⬇️ Download paper</a></p>
+</section>
 
-  <h3>Poster</h3>
+<section id="poster">
+  <h2>📊 Poster</h2>
   <div class="iframe-container" style="padding-bottom:0;height:1000px">
-    <iframe src="poster%20jysk%C3%A4vahhhh-2.pdf"></iframe>
+    <iframe src="poster.pdf"></iframe>
   </div>
-  <p><a href="poster%20jysk%C3%A4vahhhh-2.pdf" download>⬇️ Download poster</a></p>
+  <p><a href="poster.pdf" download>⬇️ Download poster</a></p>
+</section>="poster%20jysk%C3%A4vahhhh-2.pdf" download>⬇️ Download poster</a></p>
 </section>
 
   <!-- COMMENTS -->
-  <section id="comments">
-    <div class="card">
-      <h2>💬 Comments</h2>
-      <p class="muted">Local to your browser (no server). Use this to jot quick notes.</p>
-      <div class="field"><input id="commentInput" type="text" placeholder="Leave a comment…" /><button class="btn" onclick="addComment()">Submit</button></div>
-      <div id="commentList"></div>
-      <div class="hero-cta" style="justify-content:flex-start; margin-top:12px">
-        <button class="btn secondary" onclick="clearComments()">Clear all</button>
-      </div>
-    </div>
-  </section>
+
+<script>
+  // Send email notification when new comment is added
+  function addComment() {
+    const input = document.getElementById("commentInput");
+    const comment = input.value.trim();
+    if (comment) {
+      const list = document.getElementById("commentList");
+      const entry = document.createElement("div");
+      entry.style.padding = "10px";
+      entry.style.marginBottom = "10px";
+      entry.style.background = "#edf2f7";
+      entry.style.borderLeft = "4px solid #4299e1";
+      entry.textContent = comment;
+      list.appendChild(entry);
+      input.value = "";
+
+      const comments = JSON.parse(localStorage.getItem("comments") || "[]");
+      comments.push(comment);
+      localStorage.setItem("comments", JSON.stringify(comments));
+
+      // Email notification via Formspree (replace YOUR_EMAIL and YOUR_FORM_ID)
+      fetch("https://formspree.io/f/YOUR_FORM_ID", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ comment: comment, _replyto: "YOUR_EMAIL" })
+      }).then(response => {
+        if (response.ok) {
+          console.log("Email notification sent");
+        } else {
+          console.error("Failed to send email notification");
+        }
+      });
+    }
+  }
+</script>
+
 
   <!-- REFS -->
   <section id="refs">
