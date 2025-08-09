@@ -6,18 +6,18 @@
   <title>Dynamic Routing for Marine Debris Collection · Interactive Demo</title>
   <meta name="description" content="Reactive routing for marine debris collection (TOP‑MT): methods, results, figures, and an interactive demo." />
 
-  <!-- EmailJS (client-side email) -->
+  <!-- EmailJS (client-side) -->
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <script>
-    // ✅ Your EmailJS credentials
-    const EMAILJS_PUBLIC_KEY  = "ADVU4PI9eUMlMMsD2";   // Public Key
-    const EMAILJS_SERVICE_ID  = "service_glsv9dm";     // GMX SMTP service
-    const EMAILJS_TEMPLATE_ID = "template_as29om9";    // Comment notification template
+  const EMAILJS_PUBLIC_KEY  = "ADVU4PI9eUMlMMsD2";
+  const EMAILJS_SERVICE_ID  = "service_glsv9dm";
+  const EMAILJS_TEMPLATE_ID = "template_as29om9";
 
-    document.addEventListener('DOMContentLoaded', () => {
-      try { emailjs.init(EMAILJS_PUBLIC_KEY); } catch(e) { console.warn('EmailJS init skipped:', e); }
-    });
+  document.addEventListener('DOMContentLoaded', () => {
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+  });
   </script>
+
 
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -70,6 +70,7 @@
     .toast{position:fixed; right:16px; bottom:16px; background:#0b1429; border:1px solid #26406f; color:#d2defa; padding:10px 12px; border-radius:10px; display:none}
   </style>
 </head>
+  
 <body>
 
 <!-- PASSWORD GATE (modal) -->
@@ -257,19 +258,28 @@
   </section>
 
   <!-- POSTER -->
-  <section id="poster">
-    <div class="card">
-      <h2>📊 Poster</h2>
-      <!-- Prefer renaming file to poster.pdf in your repo; else URL‑encode the umlaut version -->
-      <div class="media" style="padding-bottom:140%"><embed src="poster.pdf" type="application/pdf"/></div>
-      <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap">
-        <a class="btn" href="poster.pdf" download>Download poster</a>
-      </div>
-    </div>
-  </section>
+<section id="poster">
+  <h3>📊 Poster</h3>
+  <div class="iframe-container" style="padding-bottom:0;height:1000px">
+    <iframe src="poster.pdf"></iframe>
+  </div>
+  <p><a href="poster.pdf" download>⬇️ Download poster</a></p>
+</section>
+
 
   <!-- COMMENTS -->
   <section id="comments">
+  <textarea id="commentInput" placeholder="Leave a comment..." rows="4" style="width:100%;max-width:800px;"></textarea>
+<br><br>
+<button onclick="addComment()">Submit</button>
+<div id="commentList" style="margin-top:20px;"></div>
+
+<!-- Toast-Feedback -->
+<div id="toast" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+background:#333;color:#fff;padding:10px 20px;border-radius:5px;"></div>
+
+
+    
     <div class="card">
       <h2>💬 Comments</h2>
       <p class="muted">Stored locally in your browser. Also emails you via EmailJS/GMX.</p>
@@ -330,13 +340,16 @@
   }
   window.addEventListener('load', ()=>{ const h = location.hash.replace('#',''); if(h && document.getElementById(h)) activateTab(h); });
 
+<script>
   // ===== Comments (localStorage + EmailJS) =====
   const list = document.getElementById('commentList');
+
   function addComment(){
     const input = document.getElementById('commentInput');
     const txt = input.value.trim();
     if(!txt) return;
-    // save locally
+
+    // Lokal speichern
     const comments = JSON.parse(localStorage.getItem('comments')||'[]');
     const item = {t: Date.now(), text: txt, page: location.href};
     comments.push(item);
@@ -344,14 +357,23 @@
     input.value = '';
     renderComments();
     toast('Saved.');
-    // send email (To is fixed in your EmailJS template)
+
+    // Email senden
     if (typeof emailjs !== 'undefined'){
-      const params = { comment_text: item.text, page_url: item.page, time_iso: new Date(item.t).toISOString() };
+      const params = {
+        comment_text: item.text,
+        page_url: item.page,
+        time_iso: new Date(item.t).toISOString()
+      };
       emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
-        .then(()=>console.log('Email notification sent'))
-        .catch(err=>console.warn('EmailJS send failed', err));
+        .then(()=> toast('Email sent ✅'))
+        .catch(err=> {
+          console.warn('EmailJS send failed', err);
+          toast('Email failed ❌');
+        });
     }
   }
+
   function renderComments(){
     list.innerHTML='';
     const comments = JSON.parse(localStorage.getItem('comments')||'[]');
@@ -363,10 +385,26 @@
       list.appendChild(div);
     });
   }
-  function clearComments(){ localStorage.removeItem('comments'); renderComments(); toast('Cleared.'); }
-  function escapeHtml(s){ return s.replace(/[&<>"]/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m])); }
+
+  function clearComments(){
+    localStorage.removeItem('comments');
+    renderComments();
+    toast('Cleared.');
+  }
+
+  function escapeHtml(s){
+    return s.replace(/[&<>"]/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m]));
+  }
+
   window.addEventListener('load', renderComments);
-  function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=> t.style.display='none',1600); }
+
+  function toast(msg){
+    const t=document.getElementById('toast');
+    t.textContent=msg;
+    t.style.display='block';
+    setTimeout(()=> t.style.display='none',1600);
+  }
+</script>
 
   // ===== Alpha Charts =====
   let chart1; let chart2;
